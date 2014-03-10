@@ -10,19 +10,6 @@ module.exports = function(grunt) {
           base: 'app',
           livereload: true
       },
-      proxies: [
-          {
-              context: '/service',
-              host: 'c0000757.test.cloud.fedex.com',
-              port: 8080,
-              https: false,
-              changeOrigin: false,
-              xforward: false,
-              rewrite: {
-                '^/service' : '/ref-app'
-              }
-          }
-      ],
       livereload: {
           options: {
               middleware: function (connect, options) {
