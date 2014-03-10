@@ -1,5 +1,6 @@
 ##Overview
-Simple project I ripped off from a firebase example I found on the web. I'm modifying it to use the mean stack (piece by piece).
+Simple project I ripped off from a firebase example I found on the web. I'm modifying it to use the MEAN stack (piece by piece).
+I'm trying to simulate a goofy webmeeting whiteboard as an excuse to build something.
 Eventually you will be able to create/save new drawings and view existing drawings.
 
 ##Setup
