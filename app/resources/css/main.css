@@ -1,0 +1,23 @@
+body {
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 500px;
+    background-color: #f8f8f8;
+    font-size: 24px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #424547;
+    text-align: center;
+}
+
+#drawing-canvas {
+    border: 3px solid #999
+}
+
+.colorbox {
+    width: 22px;
+    height: 22px;
+    margin: 1px;
+    display: inline-block;
+    border: 3px solid black;
+}
