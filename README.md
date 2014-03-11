@@ -6,6 +6,8 @@ Eventually you will be able to create/save new drawings and view existing drawin
 ##Setup
 Run ```npm install``` to get the project dependencies.
 
+Of course you will need a mongo server running on the default port.
+
 ##Running the application
 Run ```node server``` to start the node server (runs on port 3030, socket listener is port 3000).
 
