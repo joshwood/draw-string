@@ -1,13 +1,13 @@
 var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
 
 module.exports = function(grunt) {
- 
+
   grunt.initConfig({
     connect: {
       options: {
           port: 9000,
           hostname: 'localhost',
-          base: 'app',
+          base: 'public',
           livereload: true
       },
       livereload: {
@@ -37,7 +37,7 @@ module.exports = function(grunt) {
     watch: {
       all: {
         // Replace with whatever file you want to trigger the update from
-        // Either as a String for a single entry 
+        // Either as a String for a single entry
         // or an Array of String for multiple entries
         // You can use globing patterns like `css/**/*.css`
         // See https://github.com/gruntjs/grunt-contrib-watch#files
@@ -47,7 +47,7 @@ module.exports = function(grunt) {
         }
       }
     },
- 
+
     // grunt-open will open your browser at the project's URL
     open: {
       all: {
