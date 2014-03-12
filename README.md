@@ -13,4 +13,4 @@ Run ```node server``` to start the node server (runs on port 3030, socket listen
 
 For development purposes you can execute ```grunt server``` which will launch a server on port 9000.
 The server will watch the 'public' directory for changes and push them to the browser automatically.
-You will still need the node server running for this setup, sorry.
+This will also launch the node server and setup a proxy to it so we can access our data while in development mode.
