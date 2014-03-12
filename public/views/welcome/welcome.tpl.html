@@ -1,6 +1,31 @@
-<div ng-controller="WelcomeController">
+<div ng-controller="WelcomeController" ng-init="find()">
 
-	<h3>Welcome</h3>
+	<h3>Welcome to Draw-String</h3>
+
+    <!--div>
+        <ul>
+            <li><a href="#/drawings">Drawings</a></li>
+            <li><a href="#/about">Learn about Draw-String</a></li>
+        </ul>
+    </div-->
+
+    <div class="module">
+        <div class="box">
+            <div class="boxTitle">Create New Drawing</div>
+            <form>
+            <input type="text" class="form-control" ng-model="newDrawing.name" placeholder="Drawing Name">
+            <input type="text" class="form-control" ng-model="newDrawing.description" placeholder="Drawing Description">
+            <input type="button" class="btn-primary" ng-click="create()" value="save" style="float:right"/>
+            <input type="button" class="btn-success" ng-click="newDrawing = null" value="clear" style="float:right"/>
+            </form>
+        </div>
+        <div class="box" ng-hide="!drawings">
+            <div class="boxTitle">Existing Drawings</div>
+            <ul ng-repeat="d in drawings">
+                <li><a href="{{d._id}}">{{d.name}}</a></li>
+            </ul>
+        </div>
+    </div>
 
 
 </div>

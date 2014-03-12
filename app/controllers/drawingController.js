@@ -4,7 +4,46 @@ var mongoose = require('mongoose');
 var Coordinate = mongoose.model('Coordinate');
 var Drawing = mongoose.model('Drawing');
 
-exports.findDrawingById = function(req, res){
+/**
+ * gets all of our drawings
+ * @param req
+ * @param res
+ */
+exports.all = function(req, res){
+    Drawing.find().exec(function(err, drawings){
+        if(err){
+            console.log("ERRORORERWER 500");
+        } else {
+            res.jsonp(drawings);
+        }
+    });
+};
+
+/**
+ * creates a new drawing
+ * @param req
+ * @param res
+ */
+exports.create = function(req, res){
+
+    var drawing = new Drawing(req.body);
+    drawing.save(function(err){
+        if(err){
+            console.log("Error "+err);
+            res.send(500);
+        } else {
+            res.jsonp(drawing);
+        }
+    });
+
+};
+
+/**
+ * returns a specific drawing
+ * @param req
+ * @param res
+ */
+exports.findById = function(req, res){
 
     Coordinate.find({'drawingId': req.params.drawingId}, function(err, coordinates){
         if(err){
@@ -17,7 +56,12 @@ exports.findDrawingById = function(req, res){
 
 };
 
-exports.getDrawingCoordinates = function(req, res){
+/**
+ * gets all of the coordinates for an existing drawing
+ * @param req
+ * @param res
+ */
+exports.getCoordinates = function(req, res){
 
     Coordinate.find({'drawingId': req.params.drawingId}, function(err, coordinates){
         if(err){

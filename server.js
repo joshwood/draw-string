@@ -3,6 +3,13 @@ var express = require('express');
 var app = express();
 
 /*
+ * required for json post.
+ * this MUST be loceted here before router middleware - ugh, that was 2 hours of waste
+ * http://stackoverflow.com/questions/20381059/cant-get-post-body-from-request-using-express-js
+ */
+app.use(express.bodyParser());
+
+/*
  * web socket config
  */
 var io = require('socket.io').listen(3000, {log:false});
@@ -34,6 +41,7 @@ require('./app/routes/drawingRoutes')(app);
  * express static files location
  */
 app.use(express.static(__dirname + '/public'));
+
 
 /*
  * express listen:3030

@@ -5,8 +5,12 @@ var drawingController = require('../controllers/drawingController');
 
 module.exports = function(app) {
 
-    app.get('/drawings/:drawingId', drawingController.findDrawingById);
+    app.post('/drawings', drawingController.create);
 
-    app.get('/drawings/:drawingId/coordinates', drawingController.getDrawingCoordinates);
+    app.get('/drawings', drawingController.all);
+
+    app.get('/drawings/:drawingId', drawingController.findById);
+
+    app.get('/drawings/:drawingId/coordinates', drawingController.getCoordinates);
 
 };

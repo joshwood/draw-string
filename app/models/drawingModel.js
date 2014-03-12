@@ -19,6 +19,11 @@ var DrawingSchema = new Schema({
         type: String,
         default: '',
         trim: true
+    },
+    description: {
+        type: String,
+        default: '',
+        trim: true
     }
 });
 

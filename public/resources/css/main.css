@@ -2,12 +2,8 @@ body {
     margin-top: 10px;
     margin-left: auto;
     margin-right: auto;
-    width: 500px;
     background-color: #f8f8f8;
-    font-size: 24px;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #424547;
-    text-align: center;
 }
 
 #drawing-canvas {
@@ -20,4 +16,26 @@ body {
     margin: 1px;
     display: inline-block;
     border: 3px solid black;
+}
+
+li {
+    margin-left: -20px;
+}
+
+input{
+    display: block;
+    margin: 5px 5px 5px 0px;
+}
+.module{
+}
+.box{
+    border: solid;
+    border-width: thin;
+    margin: 5px;
+    padding: 5px;
+    display: inline-table;
+}
+.boxTitle{
+    border-bottom: 1px black solid;
+    margin-bottom: 10px;
 }
