@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ngRoute', 'ngResource', 'welcome','about']);
+var app = angular.module('app', ['ngRoute', 'ngResource', 'welcome','about', 'drawings']);
 
 /*
  * setups up our routes for the main application pages
@@ -12,6 +12,9 @@ app.config(['$routeProvider',
             when('/about', {
                 templateUrl: 'views/about/about.tpl.html'
             }).
+            when('/drawings/:drawingId', {
+                templateUrl: 'views/drawings/drawing.tpl.html'
+            }).
             otherwise({
                 templateUrl: 'views/welcome/welcome.tpl.html'
             });
@@ -21,6 +24,8 @@ app.config(['$routeProvider',
  * placeholder controller
  */
 app.controller('MainController', ['$scope', function($scope){
-    
+
+    $scope.socket = io.connect("http://localhost:3000");
+
 }]);
 

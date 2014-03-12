@@ -6,6 +6,11 @@ var Drawing = mongoose.model('Drawing');
 
 var sockets;
 
+/**
+ * This initializes our controller. It must be called explicitly
+ * when "requiring".
+ * @param io
+ */
 exports.init = function(io){
     sockets = io.sockets;
     io.sockets.on('connection', listener);
@@ -40,6 +45,7 @@ exports.create = function(req, res){
             res.send(500);
         } else {
             res.jsonp(drawing);
+            sockets.emit("drawings", drawing);
         }
     });
 
@@ -95,17 +101,18 @@ function listener(socket_io){
      */
     socket_io.on('coordinates', function (message) {
 
-        // this grabs a query parameter, need to bulletproof
-        var drawingId = socket_io.handshake.query.drawingId;
+        // grab the ID of the message
+        // todo this is sent by the client so we need to verify its there
+        var drawingId = message.id;
 
-        var c = new Coordinate(message);
+        var c = new Coordinate(message.data);
 
         c.save(function(err, coordinate){
             if(err) return console.error(err);
             //console.log(coordinate._id);
         });
 
-        sockets.emit(drawingId, message );
+        sockets.emit("drawings/"+drawingId+"/coordinates", message.data );
 
     });
 

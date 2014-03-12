@@ -1,39 +1,42 @@
 var welcome = angular.module('welcome', []);
 
-welcome.controller('WelcomeController', ['$scope', 'Drawings', function($scope, Drawings){
+welcome.controller('WelcomeController', ['$scope', '$location', 'Drawings', function($scope, $location, Drawings){
 
     $scope.newDrawing = {};
+
+    $scope.init = function(){
+        Drawings.query(function(drawings){
+            if(drawings[0]){
+                $scope.selectedId = drawings[0]._id;
+            }
+            $scope.drawings = drawings;
+        });
+    };
 
     $scope.create = function(){
         Drawings.save($scope.newDrawing,
             function(results){
                 console.log("got something "+results._id);
+                $scope.newDrawing = null;
+                $location.path('drawings/'+results._id);
             }, function(response){
                 console.log("got error "+response.status);
             });
     };
 
-    $scope.find = function(){
-        Drawings.query(function(drawings){
-            if(drawings[0]){
-                $scope.drawings = drawings;
-                $scope.selectedId = drawings[0]._id;
-            }
+    $scope.socket.on("drawings", function(drawing){
+        $scope.$apply(function(){
+            $scope.drawings.push(drawing)
         });
-    }
-
-}]);
-
-welcome.factory('Drawings', ['$resource', function($resource){
-
-    return $resource('drawings/:drawingId', {
-        drawingId: '@_id'
-    }, {
-        update: {
-            method: 'PUT'
-        }
     });
 
+    $scope.socket.on("connect", function(){
+        console.log("Connected to server");
+    });
+
+    $scope.socket.on("disconnect", function(){
+        console.log("DIS-Connected from server");
+    });
+
+
 }]);
-
-

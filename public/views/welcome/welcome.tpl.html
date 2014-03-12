@@ -1,15 +1,9 @@
-<div ng-controller="WelcomeController" ng-init="find()">
+<div ng-controller="WelcomeController" ng-init="init()">
 
 	<h3>Welcome to Draw-String</h3>
 
-    <!--div>
-        <ul>
-            <li><a href="#/drawings">Drawings</a></li>
-            <li><a href="#/about">Learn about Draw-String</a></li>
-        </ul>
-    </div-->
     <div style="padding-bottom: 25px;">
-    Click <a href="startingPointJquery.html">here</a> to see the starting point. We will eventually integrate this into the angular routes etc so we can maintain a single page application.
+        Click an existing drawing or create a new one. Anyone viewing the same drawing will see your updates.
     </div>
 
     <div class="module">
@@ -25,7 +19,7 @@
         <div class="box" ng-hide="!drawings">
             <div class="boxTitle">Existing Drawings</div>
             <ul ng-repeat="d in drawings">
-                <li><a href="{{d._id}}">{{d.name}}</a></li>
+                <li><a href="#/drawings/{{d._id}}">{{d.name}}</a></li>
             </ul>
         </div>
     </div>
