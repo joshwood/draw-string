@@ -4,9 +4,9 @@ I'm trying to simulate a goofy webmeeting whiteboard as an excuse to build somet
 Eventually you will be able to create/save new drawings and view existing drawings.
 
 ##Setup
-Run ```npm install``` to get the project dependencies.
+You will need node and grunt installed and a mongodb server up on local host (default port).
 
-Of course you will need a mongo server running on the default port.
+Run ```npm install``` to get the project dependencies.
 
 ##Running the application
 Run ```node server``` to start the node server (runs on port 3030, socket listener is port 3000).
