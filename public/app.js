@@ -25,7 +25,7 @@ app.config(['$routeProvider',
  */
 app.controller('MainController', ['$scope', function($scope){
 
-    $scope.socket = io.connect("http://localhost:3000");
+    $scope.socket = io.connect("http://"+window.location.hostname+":3000");
 
 }]);
 

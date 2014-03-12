@@ -5,7 +5,7 @@ var app = express();
 /*
  * web socket config
  */
-var io = require('socket.io').listen(3000, {log:true});
+var io = require('socket.io').listen(3000, {log:false});
 
 /*
  * required for json post.
