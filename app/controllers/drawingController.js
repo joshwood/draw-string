@@ -82,39 +82,7 @@ exports.getCoordinates = function(req, res){
 };
 
 /**
- * This is our socket listener, another total rip off from stacktrace. i suck.
- * http://stackoverflow.com/questions/19559135/use-socket-io-in-controllers
- *
- * @param socket_io
- */
-exports.listen = function(socket_io){
-
-    /*
-     * this is the listener for published coordinates. we save them
-     * under the correct drawing id and republish (under the same drawing id)
-     * for client listeners
-     */
-    socket_io.on('coordinates', function (message) {
-
-        // this grabs a query parameter, need to bulletproof
-        var drawingId = socket_io.handshake.query.drawingId;
-
-        var c = new Coordinate(message);
-
-        c.save(function(err, coordinate){
-            if(err) return console.error(err);
-            //console.log(coordinate._id);
-        });
-
-        sockets.emit(drawingId, message );
-
-    });
-
-}
-
-/**
- * This is our socket listener, another total rip off from stacktrace. i suck.
- * http://stackoverflow.com/questions/19559135/use-socket-io-in-controllers
+ * This is our socket listener
  *
  * @param socket_io
  */
