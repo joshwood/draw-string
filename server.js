@@ -3,16 +3,16 @@ var express = require('express');
 var app = express();
 
 /*
+ * web socket config
+ */
+var io = require('socket.io').listen(3000, {log:true});
+
+/*
  * required for json post.
- * this MUST be loceted here before router middleware - ugh, that was 2 hours of waste
+ * this MUST be located here before router middleware - ugh, that was 2 hours of wasted time
  * http://stackoverflow.com/questions/20381059/cant-get-post-body-from-request-using-express-js
  */
 app.use(express.bodyParser());
-
-/*
- * web socket config
- */
-var io = require('socket.io').listen(3000, {log:false});
 
 /*
  * mongoose config
@@ -32,9 +32,13 @@ require('./app/models/coordinateModel');
 require('./app/models/drawingModel');
 
 /*
- * express setup
+ * controller setup, do this prior to routes
  */
-var drawingController = require('./app/controllers/drawingController');
+require('./app/controllers/drawingController').init(io);
+
+/*
+ * express routes, must have controller config first
+ */
 require('./app/routes/drawingRoutes')(app);
 
 /*
@@ -42,15 +46,9 @@ require('./app/routes/drawingRoutes')(app);
  */
 app.use(express.static(__dirname + '/public'));
 
-
 /*
  * express listen:3030
  */
 app.listen(3030);
-
-/*
- * socket listener configs go here
- */
-io.sockets.on('connection', drawingController.listen);
 
 exports = module.exports = app;
