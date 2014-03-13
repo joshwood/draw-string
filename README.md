@@ -1,6 +1,6 @@
 ##Overview
 I'm modifying a simple [firebase drawing app](http://runnable.com/UnA1wDlk6cVmAAAr/firebase-collaborative-drawing-example-for-javascript)
-I found on [runnable](http://runnable.com/), to use the [MEAN](http://www.mean.io/) stack and [socket.io](http://socket.io/) while adding a few bells and whistles.
+I found on [runnable](http://runnable.com/) to use the [MEAN](http://www.mean.io/) stack and [socket.io](http://socket.io/) while adding a few bells and whistles.
 Basically trying to simulate a web-meeting whiteboard.
 Eventually you will be able to create/save named drawings, view existing drawings, leave comments on a drawing,
 and hopefully login using various mechanisms.
