@@ -3,7 +3,13 @@ I'm modifying a simple [firebase drawing app](http://runnable.com/UnA1wDlk6cVmAA
 I found on runnable, to use the MEAN stack and socket.io while adding a few bells and whistles.
 Basically trying to simulate a web-meeting whiteboard.
 Eventually you will be able to create/save named drawings, view existing drawings, leave comments on a drawing,
-and hopefully login using various mechanisms. Checkout "re-draw", it works well in chrome not so much in IE.
+and hopefully login using various mechanisms.
+
+Open 2 browser windows to the same drawing URL to see socket.io in action. As you draw on one
+screen it is reflect on the other. The "existing drawings" section will also auto update in all
+connected browsers when a new drawing is created.
+
+Checkout "re-draw", it works well in chrome not so much in IE.
 
 ##Setup
 You will need node and grunt installed and a mongodb server up on local host (default port).
