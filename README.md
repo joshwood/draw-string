@@ -15,8 +15,16 @@ This will also launch the node server and setup a proxy to it so we can access o
 
 OR...
 
+For development purpose, if you have nodemon installed you can execute ```grunt server-mon```.
+This task does the same thing as ```grunt server``` except it uses nodemon to monitor node server
+changes and restarts the server automatically when a change occurs.
+
+     npm install -g nodemon
+
+OR..
+
 For non-development purposes, run ```node server``` to start the node server (runs on port 3030, socket listener is port 3000).
 
 BUT...
 
-Do not run both of these on the same host or you will get port conflicts
+Do only run ONE of these on the same host or you will get port conflicts

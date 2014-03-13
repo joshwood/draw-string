@@ -14,7 +14,7 @@ var sockets;
 exports.init = function(io){
     sockets = io.sockets;
     io.sockets.on('connection', listener);
-}
+};
 
 /**
  * gets all of our drawings
@@ -70,7 +70,9 @@ exports.findById = function(req, res){
 };
 
 /**
+ * --- this isn't actually used right now.
  * gets all of the coordinates for an existing drawing
+ * we're streaming to help keep from clogging up the server
  * @param req
  * @param res
  */
@@ -115,5 +117,27 @@ function listener(socket_io){
         sockets.emit("drawings/"+drawingId+"/coordinates", message.data );
 
     });
+
+    /*
+     * this is a listener for a streamquestion from a specific client.
+     * this will pipe out the coordinates over the websocket ONLY to the
+     * requester - hopefully this will create a "redraw" effect.
+     */
+    socket_io.on('streamCoordinatesPlease', function(message){
+
+        // grab the ID of the message
+        // todo this is sent by the client so we need to verify its there
+        var drawingId = message.id;
+
+        var stream = Coordinate.find({'drawingId': drawingId}).stream();
+        stream.on('data', function(c){
+            /*
+             * here was only broadcast to the caller, not everyone. This is done by
+             * "replying" to the socket that we were handed.
+             */
+            socket_io.emit("drawings/"+drawingId+"/coordinates", c);
+        });
+
+    })
 
 }

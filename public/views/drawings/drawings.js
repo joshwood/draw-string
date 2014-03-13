@@ -86,9 +86,23 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
                 angular.forEach(coordinates, function(c){
                     drawPixel(c);
                 });
+            }, function(response){
+                console.log("error happened");
             });
+        };
 
-        }
+        /**
+         * pulls the pixels for the existing drawing using sockets to create
+         * a "live drawing" feeling.
+         */
+        $scope.redrawUsingSockets = function(){
+            ///http://stackoverflow.com/questions/2142535/how-to-clear-the-canvas-for-redrawing
+            myContext.save();
+            myContext.setTransform(1, 0, 0, 1, 0, 0);
+            myContext.clearRect(0, 0, myCanvas.width, myCanvas.height);
+            myContext.restore();
+            $scope.socket.emit('streamCoordinatesPlease', {id: $scope.drawingId});
+        };
 
         /**
          * draws a single pixel

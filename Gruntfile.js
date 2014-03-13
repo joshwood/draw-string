@@ -80,6 +80,14 @@ module.exports = function(grunt) {
                     stdout: true,
                     stderr: true
                 }
+            },
+            nodemon:{
+                command: 'nodemon server.js',
+                options: {
+                    async: true,
+                    stdout: true,
+                    stderr: true
+                }
             }
         }
 
@@ -92,15 +100,23 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-shell-spawn");
 
     grunt.registerTask('server', function (target) {
-
         grunt.task.run([
             'shell:node',
             'configureProxies',
             'connect:livereload',
-            'open',
+            //'open',
             'watch'
         ]);
+    });
 
+    grunt.registerTask('server-mon', function (target) {
+        grunt.task.run([
+            'shell:nodemon',
+            'configureProxies',
+            'connect:livereload',
+            //'open',
+            'watch'
+        ]);
     });
 
 };
