@@ -1,9 +1,9 @@
 ##Overview
 I'm modifying a simple [firebase drawing app](http://runnable.com/UnA1wDlk6cVmAAAr/firebase-collaborative-drawing-example-for-javascript)
-I found on runnable, to use the MEAN stack and socket.io.
-Basically trying to simulate a web-meeting whiteboard, adding a few bells and whistles.
+I found on runnable, to use the MEAN stack and socket.io while adding a few bells and whistles.
+Basically trying to simulate a web-meeting whiteboard.
 Eventually you will be able to create/save named drawings, view existing drawings, leave comments on a drawing,
-and hopefully login using various mechanisms.
+and hopefully login using various mechanisms. Checkout "re-draw", it works well in chrome not so much in IE.
 
 ##Setup
 You will need node and grunt installed and a mongodb server up on local host (default port).
