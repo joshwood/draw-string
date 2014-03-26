@@ -25,6 +25,22 @@ var DrawingSchema = new Schema({
         default: '',
         trim: true
     }
+}, {
+    strict: false
+});
+
+var DrawingObjectSchema = new Schema({
+    created: {
+        type: Date,
+        default: Date.now
+    },
+    drawingId: {
+        type: String,
+        default: '',
+        trim: true
+    }
+}, {
+    strict : false
 });
 
 /**
@@ -36,3 +52,4 @@ DrawingSchema.path('name').validate(function(name) {
 
 
 mongoose.model('Drawing', DrawingSchema);
+mongoose.model('DrawingObject', DrawingObjectSchema);

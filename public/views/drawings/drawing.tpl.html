@@ -1,11 +1,38 @@
 <div ng-controller="DrawingsController" ng-init="init()">
 
-    <h3>Start Drawing {{drawingId}}</h3>
+    <h3>Drawing: {{drawing.name}}</h3>
 
-    <div>
-        <canvas id="drawing-canvas" width="480" height="420"></canvas>
+    <div id="controls" style="margin: 5px;">
+        <label for="drawingMode">Draw</label>
+        <select id="drawingMode">
+            <option value="">Off</option>
+            <option value="rectangle">Rectangle</option>
+            <option value="line">Line</option>
+            <!--option value="free">Free Draw</option-->
+        </select>
+        <div style="display: table;">
+            Object layer position
+            <div>
+                <a href="#" id="sendToBack" class="layer-controls"><img src="resources/images/arrow-first.gif"></a>
+                <a href="#" id="sendBackwards" class="layer-controls"><img src="resources/images/arrow-previous.gif"></a>
+                <a href="#" id="bringForward" class="layer-controls"><img src="resources/images/arrow-next.gif"></a>
+                <a href="#" id="bringToFront" class="layer-controls"><img src="resources/images/arrow-last.gif" alt="Bring to Front"></a>
+            </div>
+        </div>
     </div>
-    <div id="colorholder"></div>
-    <input type="button" class="btn-primary" ng-click="redrawUsingSockets()" value="re-draw"/>
+    <canvas id="c"></canvas>
+    <div id="colorholder">
+        <div class="colorbox" style="background-color: white"></div>
+        <div class="colorbox" style="background-color: black"></div>
+        <div class="colorbox" style="background-color: red"></div>
+        <div class="colorbox" style="background-color: green"></div>
+        <div class="colorbox" style="background-color: blue"></div>
+        <div class="colorbox" style="background-color: deepskyblue"></div>
+        <div class="colorbox" style="background-color: yellow"></div>
+        <div class="colorbox" style="background-color: chartreuse"></div>
+    </div>
+    <div>
+        <span>Current Color: </span><div class="colorbox" id="currentColorBox"></div>
+    </div>
 
 </div>

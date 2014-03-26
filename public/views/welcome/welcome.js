@@ -14,7 +14,10 @@ welcome.controller('WelcomeController', ['$scope', '$location', 'Drawings', func
     };
 
     $scope.create = function(){
-        Drawings.save($scope.newDrawing,
+        var c = new fabric.LabeledCanvas();
+        c.name = $scope.newDrawing.name;
+        c.description = $scope.newDrawing.description;
+        Drawings.save(c,
             function(results){
                 console.log("got something "+results._id);
                 $scope.newDrawing = null;

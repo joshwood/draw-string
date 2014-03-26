@@ -1,128 +1,300 @@
 var drawings = angular.module('drawings', []);
 
 /**
- * this is bad form to be accessing dom from a controller!
+ * this is bad form to be doing all of this in a controller.
  * I'm incrementally morphing a jquery/firebase example into a more robust MEAN example,
  * hence, I'm plopping this stuff into a controller for now
  * http://runnable.com/UnA1wDlk6cVmAAAr/firebase-collaborative-drawing-example-for-javascript
  */
 drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', 'Drawings', function($scope, $route, $routeParams, Drawings){
 
-    $scope.drawingId = $routeParams.drawingId;
+    var drawingId = $routeParams.drawingId;
+
+    // just making a local ref until i refactor more, all of this is hackery
+    var socket = $scope.socket;
+    var currentColor = 'red';
+    // a flag to indicate an action was taken in this browser that likely requires the
+    // canvas to be written off to db - LAME-O
+    var possiblyDirty = false;
 
     $scope.init = function(){
-
-
-        //Set up some globals
-        var pixSize = 1, lastPoint = null, currentColor = "000", mouseDown = 0;
-
-        // Set up our canvas
-        var myCanvas = document.getElementById('drawing-canvas');
-        var myContext = myCanvas.getContext ? myCanvas.getContext('2d') : null;
-        if (myContext == null) {
-            alert("You must use a browser that supports HTML5 Canvas to run this demo.");
-            return;
-        }
-
-        //Setup each color palette & add it to the screen
-        var colors = ["fff","000","f00","0f0","00f","88f","f8d","f88","f05","f80","0f8","cf0","08f","408","ff8","8ff"];
-        for (c in colors) {
-            var item = $('<div/>').css("background-color", '#' + colors[c]).addClass("colorbox");
-            item.click((function () {
-                var col = colors[c];
-                return function () {
-                    currentColor = col;
-                };
-            })());
-            item.appendTo('#colorholder');
-        }
-
-        //Keep track of if the mouse is up or down
-        myCanvas.onmousedown = function () {mouseDown = 1;};
-        myCanvas.onmouseout = myCanvas.onmouseup = function () {
-            mouseDown = 0, lastPoint = null;
-        };
-
-        //Draw a line from the mouse's last position to its current position
-        var drawLineOnMouseMove = function(e) {
-            if (!mouseDown) return;
-
-            // Bresenham's line algorithm. We use this to ensure smooth lines are drawn
-            var offset = $('canvas').offset();
-            var x1 = Math.floor((e.pageX - offset.left) / pixSize - 1),
-                y1 = Math.floor((e.pageY - offset.top) / pixSize - 1);
-            var x0 = (lastPoint == null) ? x1 : lastPoint[0];
-            var y0 = (lastPoint == null) ? y1 : lastPoint[1];
-            var dx = Math.abs(x1 - x0), dy = Math.abs(y1 - y0);
-            var sx = (x0 < x1) ? 1 : -1, sy = (y0 < y1) ? 1 : -1, err = dx - dy;
-            while (true) {
-
-                //write the pixel to the server
-                $scope.socket.emit('coordinates', {id: $scope.drawingId, data:{'drawingId':$scope.drawingId, 'x': x0, 'y': y0, 'color': currentColor, 'pixelSize': pixSize}});
-
-                if (x0 == x1 && y0 == y1) break;
-                var e2 = 2 * err;
-                if (e2 > -dy) {
-                    err = err - dy;
-                    x0 = x0 + sx;
-                }
-                if (e2 < dx) {
-                    err = err + dx;
-                    y0 = y0 + sy;
-                }
-            }
-            lastPoint = [x1, y1];
-        }
-        $(myCanvas).mousemove(drawLineOnMouseMove);
-        $(myCanvas).mousedown(drawLineOnMouseMove);
 
         /**
          * pulls the pixels for the existing drawing
          */
-        var pullExisting = function(){
-            Drawings.query({
-                drawingId: $scope.drawingId
-            }, function(coordinates){
-                angular.forEach(coordinates, function(c){
-                    drawPixel(c);
-                });
-            }, function(response){
-                console.log("error happened");
+        Drawings.get({drawingId: drawingId}, initCanvas, function(response){
+            console.log("error happened "+response);
+        });
+
+    };
+
+    function initCanvas(drawing){
+
+        $scope.drawing = drawing;
+
+        /*
+         * here we set our custom props, because i'm too stupid to figure out how to make loadFromJson do it.
+         * works fine with my other custom objects
+         */
+        var c = new fabric.LabeledCanvas('c', {'name': drawing.name, _id: drawing._id, description: drawing.description, selection: false});
+        c.loadFromJSON(drawing);
+        c.setHeight(400);
+        c.setWidth(500);
+        c.isDrawingMode = false;
+
+        var handler, mouseDown;
+
+        c.on("mouse:down", function(o){
+            mouseDown = true;
+            handler.onMouseDown(o, {'currentColor': currentColor});
+        });
+
+        c.on("mouse:move", function(o){
+            if(!mouseDown) return;
+            handler.onMouseMove(o);
+        });
+
+        c.on("mouse:up", function(o){
+            handler.onMouseUp(o);
+            resetDrawingMode();
+            mouseDown = false;
+            possiblyDirty = true;
+        });
+
+        c.on("object:modified", function(e){
+            console.log('modified : saving canvas');
+            socket.emit('saveDrawing', c);
+        });
+
+        c.on("object:selected", function(e){
+            //console.log("selected");
+        });
+
+        c.on("object:moving", function(e){
+            socket.emit('changing', e.target);
+        });
+
+        c.on("object:scaling", function(e){
+            console.log("scaling");
+            socket.emit('changing', e.target);
+        });
+
+        c.on("object:rotating", function(e){
+            console.log("rotating");
+            socket.emit('changing', e.target);
+        });
+
+        c.on("object:added", function(e){
+            console.log('added');
+        });
+
+        c.on("object:removed", function(){
+            console.log("removed");
+        });
+
+        c.on("selection:cleared", function(e){
+            console.log("selection cleared ");
+        });
+
+        /**
+         * Drawing mode change listener - updates our handler based on the selection
+         */
+        $('#drawingMode').on('change', function(e){
+            c.isDrawingMode = this.value === "free";
+            if(this.value === "line"){
+                handler = new LineHandler({'drawingId':drawingId, 'c':c, 'socket':socket});
+            } else if (this.value === "rectangle"){
+                handler = new RectangleHandler({'drawingId':drawingId, 'c':c, 'socket':socket});
+            }
+        });
+
+        /**
+         * watches for layer manipulations and emits a socket event, and dirties the page
+         */
+        $('.layer-controls').on('click', function(e){
+            if(c.getActiveObject()){
+                var action = e.currentTarget.id;
+                socket.emit(action, c.getActiveObject());
+                possiblyDirty = true;
+            }
+            return false;
+        });
+
+        /**
+         * listens for the add object socket event and adds appropriately.
+         * also saves the canvas off if we were likely the browser that triggered the event.
+         */
+        socket.on('addObject', function(o){
+
+            /*
+             * we're currently too dumb to filter so we must check this
+             */
+            if(o.drawingId !== drawingId){
+                console.log('got message from another drawing!! crap!! Need to fix this!!! Bailing out');
+                return;
+            }
+
+            /*
+             * creates a new object and adds to the canvas
+             * I assure you i'm too stupid to come up with something this clever, previously i was switching on types
+             * and constructing the appropriate objects.
+             * Ripped from http://jsfiddle.net/Kienz/sFGGV/3/
+             */
+            var type = fabric.util.string.camelize(fabric.util.string.capitalize(o.type));
+            c.add(fabric[type].fromObject(o));
+            checkForDirty();
+        });
+
+        /**
+         * handles updating our objects, so far it works for rect and line,
+         * probably going to have issues when we add circles and stuff, need to
+         * move this into handlers
+         */
+        socket.on('changing', function(o){
+
+            $(c.getObjects()).each(function(){
+                if(this._id === o._id){
+                    // we must set to active every time, seems odd but only way to make it "real time" react
+                    c.setActiveObject(this);
+                    // this is pretty lame, i'm just transferring everything, surely a better way
+                    this.angle = o.angle;
+                    this.backgroundColor = o.backgroundColor;
+                    this.clipTo = o.clipTo;
+                    this.fill = o.fill;
+                    this.flipX = o.flipX;
+                    this.flipY = o.flipY;
+                    this.height = o.height;
+                    this.left = o.left;
+                    this.opacity = o.opacity;
+                    this.originX = o.originX;
+                    this.originY = o.originY;
+                    this.rx = o.rx;
+                    this.ry = o.ry;
+                    this.scaleX = o.scaleX;
+                    this.scaleY = o.scaleY;
+                    this.shadow = o.shadow;
+                    this.stroke = o.stroke;
+                    this.strokeDashArray = o.strokeDashArray;
+                    this.strokeLineCap = o.strokeLineCap;
+                    this.strokeLineJoin = o.strokeLineJoin;
+                    this.strokeMiterLimit = o.strokeMiterLimit;
+                    this.strokeWidth = o.strokeWidth;
+                    this.top = o.top;
+                    this.visible = o.visible;
+                    this.width = o.width;
+                    this.x = o.x;
+                    this.y = o.y;
+                    this.setCoords();
+                    checkForDirty();
+                }
             });
-        };
+        });
 
         /**
-         * pulls the pixels for the existing drawing using sockets to create
-         * a "live drawing" feeling.
+         * handles layer changing events - probably a more clever way to use a single method for all of these
          */
-        $scope.redrawUsingSockets = function(){
-            ///http://stackoverflow.com/questions/2142535/how-to-clear-the-canvas-for-redrawing
-            myContext.save();
-            myContext.setTransform(1, 0, 0, 1, 0, 0);
-            myContext.clearRect(0, 0, myCanvas.width, myCanvas.height);
-            myContext.restore();
-            $scope.socket.emit('streamCoordinatesPlease', {id: $scope.drawingId});
-        };
+        socket.on('sendToBack', function(o){
+            $(c.getObjects()).each(function(){
+                if(this._id === o._id){
+                    // we must set to active every time, seems odd but only way to make it "real time" react
+                    c.setActiveObject(this);
+                    this.sendToBack();
+                    checkForDirty();
+                }
+            });
+        });
 
         /**
-         * draws a single pixel
-         * @param point
+         * handles layer changing events - probably a more clever way to use a single method for all of these
          */
-        var drawPixel = function(point) {
-            myContext.fillStyle = "#" + point.color;
-            myContext.fillRect(parseInt(point.x) * pixSize, parseInt(point.y) * pixSize, pixSize, pixSize);
+        socket.on('sendBackwards', function(o){
+            $(c.getObjects()).each(function(){
+                if(this._id === o._id){
+                    // we must set to active every time, seems odd but only way to make it "real time" react
+                    c.setActiveObject(this);
+                    this.sendBackwards();
+                    checkForDirty();
+                }
+            });
+        });
+
+        /**
+         * handles layer changing events - probably a more clever way to use a single method for all of these
+         */
+        socket.on('bringForward', function(o){
+            $(c.getObjects()).each(function(){
+                if(this._id === o._id){
+                    // we must set to active every time, seems odd but only way to make it "real time" react
+                    c.setActiveObject(this);
+                    this.bringForward();
+                    checkForDirty();
+                }
+            });
+        });
+
+        /**
+         * handles layer changing events - probably a more clever way to use a single method for all of these
+         */
+        socket.on('bringToFront', function(o){
+            $(c.getObjects()).each(function(){
+                if(this._id === o._id){
+                    // we must set to active every time, seems odd but only way to make it "real time" react
+                    c.setActiveObject(this);
+                    this.bringToFront();
+                    checkForDirty();
+                }
+            });
+        });
+
+        /**
+         * handles click event on the color selector
+         */
+        $(".colorbox").click(function(){
+
+            currentColor = $(this).css('background-color');
+
+            $('#currentColorBox').css('background-color', currentColor);
+
+            if(c.getActiveObject()){
+                c.getActiveObject().fill = currentColor;
+                c.getActiveObject().stroke = currentColor;
+                c.getActiveObject().setCoords();
+                // this is lame, for some reason when changing colors, clients dont' update
+                // we send 2 messages and it updates
+                socket.emit('changing', c.getActiveObject());
+                socket.emit('changing', c.getActiveObject());
+                possiblyDirty = true;
+            }
+        });
+
+        /**
+         * here we will write off our canvas if any dirty-ing actions have recently occurred (ugh)
+         */
+        function checkForDirty(){
+            if(possiblyDirty){
+                console.log("!! SAVING !!");
+                socket.emit('saveDrawing', c);
+                possiblyDirty = false;
+            }
+        }
+
+        /**
+         * utility method to return to "non-drawing" mode and set our default handler.
+         */
+        function resetDrawingMode(){
+            $('#drawingMode').val('');
+            handler = new DefaultHandler({'currentColor':currentColor, 'c':c, 'socket':socket});
         }
 
         /*
-         * here we listen for any messages and update our screen
+         * set our current color indicator
          */
-        var coordinatesResource = "drawings/"+$scope.drawingId+"/coordinates";
-        $scope.socket.on(coordinatesResource, drawPixel);
+        $('#currentColorBox').css('background-color', currentColor);
 
         /*
-         * now we pull the drawing pixels
-         */
-        pullExisting();
+         * inits our default handler and drawing mode dropdown value
+          */
+        resetDrawingMode();
 
     };
 

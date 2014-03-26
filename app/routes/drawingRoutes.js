@@ -11,9 +11,4 @@ module.exports = function(app) {
 
     app.get('/drawings/:drawingId', drawingController.findById);
 
-    /*
-     * this isn't used right now but i want to move to this
-     */
-    app.get('/drawings/:drawingId/coordinates', drawingController.getCoordinates);
-
 };

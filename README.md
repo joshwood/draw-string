@@ -9,7 +9,8 @@ Open 2 browser windows to the same drawing URL to see socket.io in action. As yo
 screen it is reflect on the other. The "existing drawings" section will also auto update in all
 connected browsers when a new drawing is created.
 
-Checkout "re-draw", it works well in chrome not so much in IE.
+##Update
+Moved original code into branch called basic-version-1.0. The master branch is now using [fabric.js](http://fabricjs.com/) a bad@ss library I can't believe exists.
 
 ##Setup
 You will need ```node``` and ```grunt``` installed and a ```mongodb``` server up on local host (default port). Once you have your environment setup, get the project dependencies by executing.

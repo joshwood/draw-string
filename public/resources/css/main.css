@@ -37,3 +37,18 @@ input{
     border-bottom: 1px black solid;
     margin-bottom: 10px;
 }
+/*
+ * canvas stuff
+ */
+#c{
+    border-style: solid;
+}
+.canvas-container{
+    margin-bottom: 10px;
+}
+#controls input{
+    display: inline;
+}
+.layer-controls{
+    text-decoration: none;
+}

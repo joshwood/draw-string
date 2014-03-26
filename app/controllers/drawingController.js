@@ -3,6 +3,7 @@
 var mongoose = require('mongoose');
 var Coordinate = mongoose.model('Coordinate');
 var Drawing = mongoose.model('Drawing');
+var DrawingObject = mongoose.model('DrawingObject');
 
 var sockets;
 
@@ -58,36 +59,17 @@ exports.create = function(req, res){
  */
 exports.findById = function(req, res){
 
-    Coordinate.find({'drawingId': req.params.drawingId}, function(err, coordinates){
+    Drawing.findOne({'_id': req.params.drawingId}, function(err, drawing){
         if(err){
             //res.render('error', {status:500});
             console.log('error', {status:500});
         } else {
-            res.jsonp(coordinates);
+            res.jsonp(drawing);
         }
     });
 
 };
 
-/**
- * --- this isn't actually used right now.
- * gets all of the coordinates for an existing drawing
- * we're streaming to help keep from clogging up the server
- * @param req
- * @param res
- */
-exports.getCoordinates = function(req, res){
-
-    Coordinate.find({'drawingId': req.params.drawingId}, function(err, coordinates){
-        if(err){
-            //res.render('error', {status:500});
-            console.log('error', {status:500});
-        } else {
-            res.jsonp(coordinates);
-        }
-    });
-
-};
 
 /**
  * This is our socket listener
@@ -111,33 +93,48 @@ function listener(socket_io){
 
         c.save(function(err, coordinate){
             if(err) return console.error(err);
-            //console.log(coordinate._id);
         });
 
         sockets.emit("drawings/"+drawingId+"/coordinates", message.data );
 
     });
 
-    /*
-     * this is a listener for a streamquestion from a specific client.
-     * this will pipe out the coordinates over the websocket ONLY to the
-     * requester - hopefully this will create a "redraw" effect.
-     */
-    socket_io.on('streamCoordinatesPlease', function(message){
+    //------------- object manipulation
+    socket_io.on('changing', function(message){
+        sockets.emit('changing', message);
+    });
+    socket_io.on('sendToBack', function(message){
+        sockets.emit('sendToBack', message);
+    });
+    socket_io.on('sendBackwards', function(message){
+        sockets.emit('sendBackwards', message);
+    });
+    socket_io.on('bringForward', function(message){
+        sockets.emit('bringForward', message);
+    });
+    socket_io.on('bringToFront', function(message){
+        sockets.emit('bringToFront', message);
+    });
+    // ----------------------
 
-        // grab the ID of the message
-        // todo this is sent by the client so we need to verify its there
-        var drawingId = message.id;
-
-        var stream = Coordinate.find({'drawingId': drawingId}).stream();
-        stream.on('data', function(c){
-            /*
-             * here was only broadcast to the caller, not everyone. This is done by
-             * "replying" to the socket that we were handed.
-             */
-            socket_io.emit("drawings/"+drawingId+"/coordinates", c);
+    socket_io.on('saveDrawing', function (message) {
+        var o = new Drawing(message);
+        // i'm a tard and can't figure out how to do a simple update.
+        // keep getting errors saying can't update _id so i just deleted and saved for now
+        Drawing.remove({_id: o._id}, function(err){
+            if(err) return console.error(err);
+            o.save(function(err, object){
+                if(err) return console.error(err);
+            });
         });
+    });
 
-    })
+    socket_io.on('addObject', function (message) {
+        var o = new DrawingObject(message);
+        o.save(function(err, object){
+            if(err) return console.error(err);
+            sockets.emit("addObject", object );
+        });
+    });
 
 }
