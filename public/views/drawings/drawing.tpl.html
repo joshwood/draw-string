@@ -2,16 +2,18 @@
 
     <h3>Drawing: {{drawing.name}}</h3>
 
-    <div id="controls" style="margin: 5px;">
-        <label for="drawingMode">Draw</label>
-        <select id="drawingMode">
-            <option value="">Off</option>
-            <option value="rectangle">Rectangle</option>
-            <option value="line">Line</option>
-            <!--option value="free">Free Draw</option-->
-        </select>
-        <div style="display: table;">
-            Object layer position
+    <div style="display: inline-block; border: solid 1px; width: 97%;">
+        <div style="border: solid 1px; display: block; padding: 5px; margin: 5px; float: left;">
+            <div>Drawing Mode</div>
+            <select id="drawingMode">
+                <option value="">Off</option>
+                <option value="rectangle">Rectangle</option>
+                <option value="line">Line</option>
+                <!--option value="free">Free Draw</option-->
+            </select>
+        </div>
+        <div style="border: solid 1px; display: block; padding: 5px; margin: 5px; float: left;">
+            <div>forward/back</div>
             <div>
                 <a href="#" id="sendToBack" class="layer-controls"><img src="resources/images/arrow-first.gif"></a>
                 <a href="#" id="sendBackwards" class="layer-controls"><img src="resources/images/arrow-previous.gif"></a>
@@ -19,20 +21,26 @@
                 <a href="#" id="bringToFront" class="layer-controls"><img src="resources/images/arrow-last.gif" alt="Bring to Front"></a>
             </div>
         </div>
+        <div style="border: solid 1px; display: block; padding: 5px; margin: 5px; float: left;">
+            <div>
+                <div style="display: block; float: left; padding-right: 10px">
+                    <div class="colorbox" id="currentColorBox"></div>
+                    <div>Color</div>
+                </div>
+                <div id="colorholder" style="float: left;">
+                    <div class="colorbox" style="background-color: white"></div>
+                    <div class="colorbox" style="background-color: black"></div>
+                    <div class="colorbox" style="background-color: red"></div>
+                    <div class="colorbox" style="background-color: green"></div>
+                    <br/>
+                    <div class="colorbox" style="background-color: blue"></div>
+                    <div class="colorbox" style="background-color: deepskyblue"></div>
+                    <div class="colorbox" style="background-color: yellow"></div>
+                    <div class="colorbox" style="background-color: chartreuse"></div>
+                </div>
+            </div>
+        </div>
     </div>
     <canvas id="c"></canvas>
-    <div id="colorholder">
-        <div class="colorbox" style="background-color: white"></div>
-        <div class="colorbox" style="background-color: black"></div>
-        <div class="colorbox" style="background-color: red"></div>
-        <div class="colorbox" style="background-color: green"></div>
-        <div class="colorbox" style="background-color: blue"></div>
-        <div class="colorbox" style="background-color: deepskyblue"></div>
-        <div class="colorbox" style="background-color: yellow"></div>
-        <div class="colorbox" style="background-color: chartreuse"></div>
-    </div>
-    <div>
-        <span>Current Color: </span><div class="colorbox" id="currentColorBox"></div>
-    </div>
 
 </div>

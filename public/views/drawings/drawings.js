@@ -286,6 +286,31 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
             handler = new DefaultHandler({'currentColor':currentColor, 'c':c, 'socket':socket});
         }
 
+        // get viewport size
+        var getViewportSize = function() {
+            return {
+                height: window.innerHeight,
+                width:  window.innerWidth
+            };
+        };
+
+        // update canvas size
+        var updateSizes = function() {
+            var viewportSize = getViewportSize();
+            c.setWidth(viewportSize.width * .95);
+            c.setHeight(viewportSize.height * .65);
+            //$('#myCanvas').attr('width', viewportSize.width).attr('height', viewportSize.height);
+        };
+
+        // run on load
+        updateSizes();
+
+        // handle window resizing
+        $(window).on('resize', function() {
+            updateSizes();
+        });
+
+
         /*
          * set our current color indicator
          */
