@@ -9,9 +9,10 @@ var DefaultTool = function(context){
     this.currentColor = context.currentColor;
     this.fabricCanvas = context.fabricCanvas;
     this.socket = context.socket;
+    this.fabricCanvas.isDrawingMode = false;
 }
 
-DefaultTool.prototype.onMouseDown = function(o){
+DefaultTool.prototype.onMouseDown = function(o, context){
 };
 
 DefaultTool.prototype.onMouseMove = function(o){

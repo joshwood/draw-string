@@ -13,6 +13,7 @@ var LineTool = function(context){
     this.drawingId = context.drawingId;
     this.fabricCanvas = context.fabricCanvas;
     this.socket = context.socket;
+    this.fabricCanvas.isDrawingMode = false;
 }
 
 /**
