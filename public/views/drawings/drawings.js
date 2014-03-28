@@ -8,27 +8,40 @@ var drawings = angular.module('drawings', []);
  */
 drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', 'Drawings', function($scope, $route, $routeParams, Drawings){
 
-    var drawingId = $routeParams.drawingId;
-
-    // just making a local ref until i refactor more, all of this is hackery
-    var socket = $scope.socket;
     var currentColor = 'red';
-    // a flag to indicate an action was taken in this browser that likely requires the
-    // canvas to be written off to db - LAME-O
-    var possiblyDirty = false;
 
+    /*
+     * a flag to indicate an action was taken in this browser that likely requires the
+     * canvas to be written off to db - LAME-O
+     */
+    $scope.possiblyDirty = false;
+
+    /**
+     * init method called each time the page loads
+     */
     $scope.init = function(){
+
+        /*
+         * because we're a single page app the socket listeners from previous drawing views persist.
+         * so we must remove previous listeners then re-init them for the current drawing.
+         * there goes 4 hours of my life
+         */
+        $scope.socket.removeAllListeners();
 
         /**
          * pulls the pixels for the existing drawing
          */
-        Drawings.get({drawingId: drawingId}, initCanvas, function(response){
+        Drawings.get({drawingId: $routeParams.drawingId}, $scope.initCanvas, function(response){
             console.log("error happened "+response);
         });
 
     };
 
-    function initCanvas(drawing){
+    /**
+     * Loads drawing, inits listeners
+     * @param drawing
+     */
+    $scope.initCanvas = function(drawing){
 
         $scope.drawing = drawing;
 
@@ -36,75 +49,85 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
          * here we set our custom props, because i'm too stupid to figure out how to make loadFromJson do it.
          * works fine with my other custom objects
          */
-        var c = new fabric.LabeledCanvas('c', {'name': drawing.name, _id: drawing._id, description: drawing.description, selection: false});
-        c.loadFromJSON(drawing);
-        c.setHeight(400);
-        c.setWidth(500);
-        c.isDrawingMode = false;
+        $scope.fabricCanvas = new fabric.LabeledCanvas('c', {'name': $scope.drawing.name, _id: $scope.drawing._id, description: $scope.drawing.description, selection: false});
+        $scope.fabricCanvas.loadFromJSON(drawing);
+        $scope.fabricCanvas.setHeight(400);
+        $scope.fabricCanvas.setWidth(500);
+        $scope.fabricCanvas.isDrawingMode = false;
 
-        var handler, mouseDown;
+        var mouseDown;
 
-        c.on("mouse:down", function(o){
+        $scope.fabricCanvas.on("mouse:down", function(o){
             mouseDown = true;
-            handler.onMouseDown(o, {'currentColor': currentColor});
+            $scope.handler.onMouseDown(o, {'currentColor': currentColor});
         });
 
-        c.on("mouse:move", function(o){
+        $scope.fabricCanvas.on("mouse:move", function(o){
             if(!mouseDown) return;
-            handler.onMouseMove(o);
+            $scope.handler.onMouseMove(o);
         });
 
-        c.on("mouse:up", function(o){
-            handler.onMouseUp(o);
+        $scope.fabricCanvas.on("mouse:up", function(o){
+            console.log("MOUSE UP");
+            $scope.handler.onMouseUp(o);
             resetDrawingMode();
             mouseDown = false;
-            possiblyDirty = true;
+            $scope.possiblyDirty = true;
         });
 
-        c.on("object:modified", function(e){
+        $scope.fabricCanvas.on("object:modified", function(e){
             console.log('modified : saving canvas');
-            socket.emit('saveDrawing', c);
+            $scope.socket.emit('saveDrawing', $scope.fabricCanvas);
         });
 
-        c.on("object:selected", function(e){
+        $scope.fabricCanvas.on("object:selected", function(e){
             //console.log("selected");
         });
 
-        c.on("object:moving", function(e){
-            socket.emit('changing', e.target);
+        $scope.fabricCanvas.on("object:moving", function(e){
+            $scope.socket.emit('changing', e.target);
         });
 
-        c.on("object:scaling", function(e){
+        $scope.fabricCanvas.on("object:scaling", function(e){
             console.log("scaling");
-            socket.emit('changing', e.target);
+            $scope.socket.emit('changing', e.target);
         });
 
-        c.on("object:rotating", function(e){
+        $scope.fabricCanvas.on("object:rotating", function(e){
             console.log("rotating");
-            socket.emit('changing', e.target);
+            $scope.socket.emit('changing', e.target);
         });
 
-        c.on("object:added", function(e){
+        $scope.fabricCanvas.on("object:added", function(e){
             console.log('added');
         });
 
-        c.on("object:removed", function(){
+        $scope.fabricCanvas.on("object:removed", function(){
             console.log("removed");
         });
 
-        c.on("selection:cleared", function(e){
+        $scope.fabricCanvas.on("selection:cleared", function(e){
             console.log("selection cleared ");
+        });
+
+        $scope.fabricCanvas.on("path:created", function(e){
+            console.log("path created");
+            $scope.possiblyDirty = true;
+            $scope.handler.onPathCreated(e);
+            resetDrawingMode();
         });
 
         /**
          * Drawing mode change listener - updates our handler based on the selection
          */
         $('#drawingMode').on('change', function(e){
-            c.isDrawingMode = this.value === "free";
+            $scope.fabricCanvas.isDrawingMode = this.value === "free";
             if(this.value === "line"){
-                handler = new LineHandler({'drawingId':drawingId, 'c':c, 'socket':socket});
+                $scope.handler = new LineHandler({'drawingId':$scope.drawing._id, 'c':$scope.fabricCanvas, 'socket':$scope.socket});
             } else if (this.value === "rectangle"){
-                handler = new RectangleHandler({'drawingId':drawingId, 'c':c, 'socket':socket});
+                $scope.handler = new RectangleHandler({'drawingId':$scope.drawing._id, 'c':$scope.fabricCanvas, 'socket':$scope.socket});
+            } else if (this.value === "free"){
+                $scope.handler = new FreeDrawingHandler({'drawingId':$scope.drawing._id, 'c':$scope.fabricCanvas, 'socket':$scope.socket});
             }
         });
 
@@ -112,10 +135,10 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
          * watches for layer manipulations and emits a socket event, and dirties the page
          */
         $('.layer-controls').on('click', function(e){
-            if(c.getActiveObject()){
+            if($scope.fabricCanvas.getActiveObject()){
                 var action = e.currentTarget.id;
-                socket.emit(action, c.getActiveObject());
-                possiblyDirty = true;
+                $scope.socket.emit(action, $scope.fabricCanvas.getActiveObject());
+                $scope.possiblyDirty = true;
             }
             return false;
         });
@@ -124,13 +147,13 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
          * listens for the add object socket event and adds appropriately.
          * also saves the canvas off if we were likely the browser that triggered the event.
          */
-        socket.on('addObject', function(o){
+        $scope.socket.on('addObject', function(o){
 
             /*
              * we're currently too dumb to filter so we must check this
              */
-            if(o.drawingId !== drawingId){
-                console.log('got message from another drawing!! crap!! Need to fix this!!! Bailing out');
+            if(o.drawingId !== $scope.drawing._id){
+                console.log('got message from another drawing!! crap!! Need to fix this!!! Bailing out : '+o.drawingId + ' : '+$scope.drawing._id);
                 return;
             }
 
@@ -141,49 +164,27 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
              * Ripped from http://jsfiddle.net/Kienz/sFGGV/3/
              */
             var type = fabric.util.string.camelize(fabric.util.string.capitalize(o.type));
-            c.add(fabric[type].fromObject(o));
+            $scope.fabricCanvas.add(fabric[type].fromObject(o));
             checkForDirty();
         });
 
         /**
-         * handles updating our objects, so far it works for rect and line,
-         * probably going to have issues when we add circles and stuff, need to
-         * move this into handlers
+         * handles updating our objects
          */
-        socket.on('changing', function(o){
+        $scope.socket.on('changing', function(o){
 
-            $(c.getObjects()).each(function(){
+            $($scope.fabricCanvas.getObjects()).each(function(){
                 if(this._id === o._id){
                     // we must set to active every time, seems odd but only way to make it "real time" react
-                    c.setActiveObject(this);
+                    $scope.fabricCanvas.setActiveObject(this);
                     // this is pretty lame, i'm just transferring everything, surely a better way
-                    this.angle = o.angle;
-                    this.backgroundColor = o.backgroundColor;
-                    this.clipTo = o.clipTo;
-                    this.fill = o.fill;
-                    this.flipX = o.flipX;
-                    this.flipY = o.flipY;
-                    this.height = o.height;
-                    this.left = o.left;
-                    this.opacity = o.opacity;
-                    this.originX = o.originX;
-                    this.originY = o.originY;
-                    this.rx = o.rx;
-                    this.ry = o.ry;
-                    this.scaleX = o.scaleX;
-                    this.scaleY = o.scaleY;
-                    this.shadow = o.shadow;
-                    this.stroke = o.stroke;
-                    this.strokeDashArray = o.strokeDashArray;
-                    this.strokeLineCap = o.strokeLineCap;
-                    this.strokeLineJoin = o.strokeLineJoin;
-                    this.strokeMiterLimit = o.strokeMiterLimit;
-                    this.strokeWidth = o.strokeWidth;
-                    this.top = o.top;
-                    this.visible = o.visible;
-                    this.width = o.width;
-                    this.x = o.x;
-                    this.y = o.y;
+                    if(this.type === "labeled-line"){
+                        this.initialize([o.x1, o.y1, o.x2, o.y2], o);
+                    }else if(this.type === "labeled-path" || this.type === "path"){
+                        this.initialize(o.path, o);
+                    }else if(this.type === "labeled-rect"){
+                        this.initialize(o);
+                    }
                     this.setCoords();
                     checkForDirty();
                 }
@@ -193,11 +194,11 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
         /**
          * handles layer changing events - probably a more clever way to use a single method for all of these
          */
-        socket.on('sendToBack', function(o){
-            $(c.getObjects()).each(function(){
+        $scope.socket.on('sendToBack', function(o){
+            $($scope.fabricCanvas.getObjects()).each(function(){
                 if(this._id === o._id){
                     // we must set to active every time, seems odd but only way to make it "real time" react
-                    c.setActiveObject(this);
+                    $scope.fabricCanvas.setActiveObject(this);
                     this.sendToBack();
                     checkForDirty();
                 }
@@ -207,11 +208,11 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
         /**
          * handles layer changing events - probably a more clever way to use a single method for all of these
          */
-        socket.on('sendBackwards', function(o){
-            $(c.getObjects()).each(function(){
+        $scope.socket.on('sendBackwards', function(o){
+            $($scope.fabricCanvas.getObjects()).each(function(){
                 if(this._id === o._id){
                     // we must set to active every time, seems odd but only way to make it "real time" react
-                    c.setActiveObject(this);
+                    $scope.fabricCanvas.setActiveObject(this);
                     this.sendBackwards();
                     checkForDirty();
                 }
@@ -221,11 +222,11 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
         /**
          * handles layer changing events - probably a more clever way to use a single method for all of these
          */
-        socket.on('bringForward', function(o){
-            $(c.getObjects()).each(function(){
+        $scope.socket.on('bringForward', function(o){
+            $($scope.fabricCanvas.getObjects()).each(function(){
                 if(this._id === o._id){
                     // we must set to active every time, seems odd but only way to make it "real time" react
-                    c.setActiveObject(this);
+                    $scope.fabricCanvas.setActiveObject(this);
                     this.bringForward();
                     checkForDirty();
                 }
@@ -235,11 +236,11 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
         /**
          * handles layer changing events - probably a more clever way to use a single method for all of these
          */
-        socket.on('bringToFront', function(o){
-            $(c.getObjects()).each(function(){
+        $scope.socket.on('bringToFront', function(o){
+            $($scope.fabricCanvas.getObjects()).each(function(){
                 if(this._id === o._id){
                     // we must set to active every time, seems odd but only way to make it "real time" react
-                    c.setActiveObject(this);
+                    $scope.fabricCanvas.setActiveObject(this);
                     this.bringToFront();
                     checkForDirty();
                 }
@@ -255,15 +256,15 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
 
             $('#currentColorBox').css('background-color', currentColor);
 
-            if(c.getActiveObject()){
-                c.getActiveObject().fill = currentColor;
-                c.getActiveObject().stroke = currentColor;
-                c.getActiveObject().setCoords();
+            if($scope.fabricCanvas.getActiveObject()){
+                $scope.fabricCanvas.getActiveObject().fill = currentColor;
+                $scope.fabricCanvas.getActiveObject().stroke = currentColor;
+                $scope.fabricCanvas.getActiveObject().setCoords();
                 // this is lame, for some reason when changing colors, clients dont' update
                 // we send 2 messages and it updates
-                socket.emit('changing', c.getActiveObject());
-                socket.emit('changing', c.getActiveObject());
-                possiblyDirty = true;
+                $scope.socket.emit('changing', $scope.fabricCanvas.getActiveObject());
+                $scope.socket.emit('changing', $scope.fabricCanvas.getActiveObject());
+                $scope.possiblyDirty = true;
             }
         });
 
@@ -271,10 +272,10 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
          * here we will write off our canvas if any dirty-ing actions have recently occurred (ugh)
          */
         function checkForDirty(){
-            if(possiblyDirty){
+            if($scope.possiblyDirty){
                 console.log("!! SAVING !!");
-                socket.emit('saveDrawing', c);
-                possiblyDirty = false;
+                $scope.socket.emit('saveDrawing', $scope.fabricCanvas);
+                $scope.possiblyDirty = false;
             }
         }
 
@@ -282,12 +283,13 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
          * utility method to return to "non-drawing" mode and set our default handler.
          */
         function resetDrawingMode(){
+            $scope.fabricCanvas.isDrawingMode = false;
             $('#drawingMode').val('');
-            handler = new DefaultHandler({'currentColor':currentColor, 'c':c, 'socket':socket});
+            $scope.handler = new DefaultHandler({'currentColor':currentColor, 'c':$scope.fabricCanvas, 'socket':$scope.socket});
         }
 
-        // get viewport size
-        var getViewportSize = function() {
+        // get viewPort size
+        var getViewPortSize = function() {
             return {
                 height: window.innerHeight,
                 width:  window.innerWidth
@@ -296,10 +298,9 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
 
         // update canvas size
         var updateSizes = function() {
-            var viewportSize = getViewportSize();
-            c.setWidth(viewportSize.width * .95);
-            c.setHeight(viewportSize.height * .65);
-            //$('#myCanvas').attr('width', viewportSize.width).attr('height', viewportSize.height);
+            var viewPortSize = getViewPortSize();
+            $scope.fabricCanvas.setWidth(viewPortSize.width * .95);
+            $scope.fabricCanvas.setHeight(viewPortSize.height * .65);
         };
 
         // run on load
@@ -317,7 +318,7 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
         $('#currentColorBox').css('background-color', currentColor);
 
         /*
-         * inits our default handler and drawing mode dropdown value
+         * inits our default $scope.handler and drawing mode dropdown value
           */
         resetDrawingMode();
 

@@ -32,7 +32,7 @@ app.controller('MainController', ['$scope', function($scope){
 //////////////////////// just dumping all this crap here until i can refactor
 
 /**
- *
+ * Handles drawing events when the tool is rectangle
  * @constructor
  */
 var RectangleHandler = function (context){
@@ -74,6 +74,10 @@ RectangleHandler.prototype.onMouseUp = function(o){
     this.c.remove(this.rectangle);
 };
 
+RectangleHandler.prototype.onPathCreated = function(o){
+
+}
+
 RectangleHandler.prototype.drawRectangle = function(x, y, width, height, fill){
     // create a rectangle object
     var rect = new fabric.LabeledRect({
@@ -86,7 +90,6 @@ RectangleHandler.prototype.drawRectangle = function(x, y, width, height, fill){
         height: height,
         fill: fill
     });
-
     this.socket.emit('addObject', rect);
 };
 
@@ -127,6 +130,10 @@ LineHandler.prototype.onMouseUp = function(o){
     this.c.remove(this.line);
 }
 
+LineHandler.prototype.onPathCreated = function(o){
+
+}
+
 LineHandler.prototype.drawLine = function(x1, y1, x2, y2, stroke, strokeWidth, fill){
     var newLine = new fabric.LabeledLine([x1, y1, x2, y2], {
         drawingId: this.drawingId,
@@ -138,6 +145,36 @@ LineHandler.prototype.drawLine = function(x1, y1, x2, y2, stroke, strokeWidth, f
     });
     this.socket.emit('addObject', newLine);
 }
+
+/**
+ * Handles drawing events when the tool is freedraw
+ * @constructor
+ */
+var FreeDrawingHandler = function (context){
+    this.drawingId = context.drawingId;
+    this.c = context.c;
+    this.socket = context.socket;
+};
+
+FreeDrawingHandler.prototype.onMouseDown = function(o, context){
+};
+
+FreeDrawingHandler.prototype.onMouseMove = function(o){
+};
+
+FreeDrawingHandler.prototype.onMouseUp = function(o){
+};
+
+FreeDrawingHandler.prototype.onPathCreated = function(o){
+
+    var newPath = new fabric.LabeledPath(o.path.path);
+    newPath.set(o.path);
+    newPath.set({type: 'labeled-path'});
+    newPath.set({drawingId: this.drawingId});
+    this.c.remove(o.path);
+    this.socket.emit('addObject', newPath.toObject(['drawingId']));
+
+};
 
 /**
  * DefaultHandler - this handles mouse events when there is no drawing mode selected.
@@ -161,11 +198,10 @@ DefaultHandler.prototype.onMouseMove = function(o){
 DefaultHandler.prototype.onMouseUp = function(o){
 }
 
-DefaultHandler.prototype.drawLine = function(x1, y1, x2, y2, stroke, strokeWidth, fill){
+DefaultHandler.prototype.onPathCreated = function(o){
+
 }
 
-DefaultHandler.addObject = function(o, c){
-};
 
 /**
  * http://stackoverflow.com/questions/11272772/fabric-js-how-to-save-canvas-on-server-with-custom-attributes
@@ -203,6 +239,10 @@ fabric.LabeledCanvas = fabric.util.createClass(fabric.Canvas, {
     }
 });
 
+/**
+ * overriding the fabric.Rect class
+ * @type {*}
+ */
 fabric.LabeledRect = fabric.util.createClass(fabric.Rect, {
     type: 'labeled-rect',
     initialize: function(options) {
@@ -222,6 +262,10 @@ fabric.LabeledRect.fromObject = function(o, callback){
     return new fabric.LabeledRect(o);
 };
 
+/**
+ * overriding the fabric.Line class
+ * @type {*}
+ */
 fabric.LabeledLine = fabric.util.createClass(fabric.Line, {
     type: 'labeled-line',
     initialize: function(points, options) {
@@ -242,3 +286,37 @@ fabric.LabeledLine.fromObject = function(o, callback){
     return new fabric.LabeledLine([o.x1, o.y1, o.x2, o.y2], o);
 };
 
+/**
+ * overriding the fabric.Path class
+ * @type {*}
+ */
+fabric.LabeledPath = fabric.util.createClass(fabric.Path, {
+    type: 'labeled-path',
+    initialize: function(path, options) {
+        options || (options = { });
+        path || (path = []);
+        this.callSuper('initialize', path, options);
+        this.set('_id', options._id);
+        this.set('drawingId', options.drawingId);
+    }
+    ,
+    toObject: function() {
+        return fabric.util.object.extend(this.callSuper('toObject'), {
+            _id: this.get('_id'),
+            drawingId: this.get('drawingId')
+        });
+    },
+    toJSON: function() {
+        return fabric.util.object.extend(this.callSuper('toJSON'), {
+            _id: this.get('_id'),
+            drawingId: this.get('drawingId')
+        });
+    }
+});
+
+fabric.LabeledPath.fromObject = function(o, callback){
+    var x = new fabric.LabeledPath(o.path);
+    x.set(o);
+    x.set({drawingId: o.drawingId});
+    return x;
+};
