@@ -123,11 +123,11 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
         $('#drawingMode').on('change', function(e){
             $scope.fabricCanvas.isDrawingMode = this.value === "free";
             if(this.value === "line"){
-                $scope.handler = new LineHandler({'drawingId':$scope.drawing._id, 'c':$scope.fabricCanvas, 'socket':$scope.socket});
+                $scope.handler = new LineTool({'drawingId':$scope.drawing._id, 'fabricCanvas':$scope.fabricCanvas, 'socket':$scope.socket});
             } else if (this.value === "rectangle"){
-                $scope.handler = new RectangleHandler({'drawingId':$scope.drawing._id, 'c':$scope.fabricCanvas, 'socket':$scope.socket});
+                $scope.handler = new RectangleTool({'drawingId':$scope.drawing._id, 'fabricCanvas':$scope.fabricCanvas, 'socket':$scope.socket});
             } else if (this.value === "free"){
-                $scope.handler = new FreeDrawingHandler({'drawingId':$scope.drawing._id, 'c':$scope.fabricCanvas, 'socket':$scope.socket});
+                $scope.handler = new FreeDrawingTool({'drawingId':$scope.drawing._id, 'fabricCanvas':$scope.fabricCanvas, 'socket':$scope.socket});
             }
         });
 
@@ -280,12 +280,12 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
         }
 
         /**
-         * utility method to return to "non-drawing" mode and set our default handler.
+         * utility method to return to "non-drawing" mode and set our default tool.
          */
         function resetDrawingMode(){
             $scope.fabricCanvas.isDrawingMode = false;
             $('#drawingMode').val('');
-            $scope.handler = new DefaultHandler({'currentColor':currentColor, 'c':$scope.fabricCanvas, 'socket':$scope.socket});
+            $scope.handler = new DefaultTool({'currentColor':currentColor, 'fabricCanvas':$scope.fabricCanvas, 'socket':$scope.socket});
         }
 
         // get viewPort size
