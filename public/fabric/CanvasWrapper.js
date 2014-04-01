@@ -1,12 +1,5 @@
 var CanvasWrapper = function(id, context, socket){
 
-    this.modes = {
-        LINE : 'line',
-        RECTANGLE : 'rectangle',
-        FREE : 'free',
-        DEFAULT : 'default'
-    };
-
     this.canvas = new fabric.LabeledCanvas(id, context);
     this.canvas.isDrawingMode = false;
     this.socket = socket;
@@ -14,7 +7,28 @@ var CanvasWrapper = function(id, context, socket){
     this.possiblyDirty = false;
     this.currentColor = 'red';
 
-    this.handler = new DefaultTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket});
+    /*
+     * because we're a single page app the socket listeners from previous drawing views persist.
+     * so we must remove previous listeners then re-init them for the current drawing.
+     * there goes 4 hours of my life
+     */
+    this.socket.removeAllListeners();
+
+    /*
+     * drawing tools map
+     */
+    this.tools = {
+        LINE :      new LineTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
+        RECTANGLE : new RectangleTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
+        FREE :      new FreeDrawingTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
+        TEXT :      new TextTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
+        DEFAULT :   new DefaultTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket})
+    };
+
+    /*
+     * initialize with default
+     */
+    this.handler = this.tools.DEFAULT;
 
     /*
      * we have to do this because we lose 'this' when in listeners. again, not my own solution
@@ -82,25 +96,21 @@ var CanvasWrapper = function(id, context, socket){
         //self.self.resetDrawingMode();
     });
 
-
     this.socket.on('changing', function(o){
-
-        $(self.canvas.getObjects()).each(function(){
-            if(this._id === o._id){
-                // we must set to active every time, seems odd but only way to make it "real time" react
-                self.canvas.setActiveObject(this);
-                // this is pretty lame, i'm just transferring everything, surely a better way
-                if(this.type === "labeled-line"){
-                    this.initialize([o.x1, o.y1, o.x2, o.y2], o);
-                }else if(this.type === "labeled-path" || this.type === "path"){
-                    this.initialize(o.path, o);
-                }else if(this.type === "labeled-rect"){
-                    this.initialize(o);
-                }
-                this.setCoords();
-                self.checkForDirty();
-            }
-        });
+        var obj = self.canvas.findById(o._id);
+        // we must set to active every time, seems odd but only way to make it "real time" react
+        self.canvas.setActiveObject(obj);
+        // this is pretty lame, i'm just transferring everything, surely a better way
+        if(obj.type === "labeled-line"){
+            obj.initialize([o.x1, o.y1, o.x2, o.y2], o);
+        }else if(obj.type === "labeled-path" || obj.type === "path"){
+            obj.initialize(o.path, o);
+        }else if(obj.type === "labeled-rect"){
+            obj.initialize(o);
+        }else if(obj.type === "labeled-i-text"){
+        }
+        obj.setCoords();
+        self.checkForDirty();
     });
 
     /**
@@ -124,64 +134,54 @@ var CanvasWrapper = function(id, context, socket){
          * Ripped from http://jsfiddle.net/Kienz/sFGGV/3/
          */
         var type = fabric.util.string.camelize(fabric.util.string.capitalize(o.type));
-        self.canvas.add(fabric[type].fromObject(o));
+        var newO = fabric[type].fromObject(o);
+        self.canvas.add(newO);
         self.checkForDirty();
+
     });
 
     /**
      * handles layer changing events - probably a more clever way to use a single method for all of these
      */
     this.socket.on('sendToBack', function(o){
-        $(self.canvas.getObjects()).each(function(){
-            if(this._id === o._id){
-                // we must set to active every time, seems odd but only way to make it "real time" react
-                self.canvas.setActiveObject(this);
-                this.sendToBack();
-                self.checkForDirty();
-            }
-        });
+        var obj = self.canvas.findById(o._id);
+        // we must set to active every time, seems odd but only way to make it "real time" react
+        self.canvas.setActiveObject(obj);
+        obj.sendToBack();
+        self.checkForDirty();
     });
 
     /**
      * handles layer changing events - probably a more clever way to use a single method for all of these
      */
     this.socket.on('sendBackwards', function(o){
-        $(self.canvas.getObjects()).each(function(){
-            if(this._id === o._id){
-                // we must set to active every time, seems odd but only way to make it "real time" react
-                self.canvas.setActiveObject(this);
-                this.sendBackwards();
-                self.checkForDirty();
-            }
-        });
+        var obj = self.canvas.findById(o._id);
+        // we must set to active every time, seems odd but only way to make it "real time" react
+        self.canvas.setActiveObject(obj);
+        obj.sendBackwards();
+        self.checkForDirty();
     });
 
     /**
      * handles layer changing events - probably a more clever way to use a single method for all of these
      */
     this.socket.on('bringForward', function(o){
-        $(self.canvas.getObjects()).each(function(){
-            if(this._id === o._id){
-                // we must set to active every time, seems odd but only way to make it "real time" react
-                self.canvas.setActiveObject(this);
-                this.bringForward();
-                self.checkForDirty();
-            }
-        });
+        var obj = self.canvas.findById(o._id);
+        // we must set to active every time, seems odd but only way to make it "real time" react
+        self.canvas.setActiveObject(obj);
+        obj.bringForward();
+        self.checkForDirty();
     });
 
     /**
      * handles layer changing events - probably a more clever way to use a single method for all of these
      */
     this.socket.on('bringToFront', function(o){
-        $(self.canvas.getObjects()).each(function(){
-            if(this._id === o._id){
-                // we must set to active every time, seems odd but only way to make it "real time" react
-                self.canvas.setActiveObject(this);
-                this.bringToFront();
-                self.checkForDirty();
-            }
-        });
+        var obj = self.canvas.findById(o._id);
+        // we must set to active every time, seems odd but only way to make it "real time" react
+        self.canvas.setActiveObject(obj);
+        obj.bringToFront();
+        self.checkForDirty();
     });
 
 }
@@ -190,15 +190,8 @@ var CanvasWrapper = function(id, context, socket){
  * utility method to return to "non-drawing" mode and set our default tool.
  */
 CanvasWrapper.prototype.changeDrawingMode = function(mode){
-    if(mode === this.modes.LINE){
-        this.handler = new LineTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket});
-    } else if (mode === this.modes.RECTANGLE){
-        this.handler = new RectangleTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket});
-    } else if (mode === this.modes.FREE){
-        this.handler = new FreeDrawingTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket});
-    } else if (mode === this.modes.DEFAULT){
-        this.handler = new DefaultTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket});
-    }
+    this.handler = this.tools[mode.toUpperCase()];
+    this.handler.init();
 };
 
 CanvasWrapper.prototype.updateCurrentColor = function(currentColor) {
@@ -228,7 +221,7 @@ CanvasWrapper.prototype.updateCanvasSize = function(viewPort) {
 };
 
 CanvasWrapper.prototype.resetDrawingMode = function(){
-    this.changeDrawingMode(this.modes.DEFAULT);
+    this.handler = this.tools.DEFAULT;
 }
 
 CanvasWrapper.prototype.loadFromJSON = function(data){

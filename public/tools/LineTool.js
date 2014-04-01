@@ -16,6 +16,10 @@ var LineTool = function(context){
     this.fabricCanvas.isDrawingMode = false;
 }
 
+LineTool.prototype.init = function(){
+    this.fabricCanvas.isDrawingMode = false;
+};
+
 /**
  * This initiates the drawing of a line. 
  * We grab the current tool settings from the context passed in.

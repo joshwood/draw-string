@@ -33,3 +33,8 @@ fabric.LabeledCanvas = fabric.util.createClass(fabric.Canvas, {
         });
     }
 });
+fabric.LabeledCanvas.prototype.findById = function(id){
+    return this.getObjects().filter(function( obj ) {
+        return obj._id === id;
+    })[ 0 ];
+}

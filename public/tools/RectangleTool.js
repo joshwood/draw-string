@@ -12,6 +12,9 @@ var RectangleTool = function (context){
     this.drawingId = context.drawingId;
     this.fabricCanvas = context.fabricCanvas;
     this.socket = context.socket;
+};
+
+RectangleTool.prototype.init = function(){
     this.fabricCanvas.isDrawingMode = false;
 };
 

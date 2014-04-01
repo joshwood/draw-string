@@ -103,6 +103,9 @@ function listener(socket_io){
     socket_io.on('changing', function(message){
         sockets.emit('changing', message);
     });
+    socket_io.on('text-changing', function(message){
+        sockets.emit('text-changing', message);
+    });
     socket_io.on('sendToBack', function(message){
         sockets.emit('sendToBack', message);
     });

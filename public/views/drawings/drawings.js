@@ -21,13 +21,6 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
      */
     $scope.init = function(){
 
-        /*
-         * because we're a single page app the socket listeners from previous drawing views persist.
-         * so we must remove previous listeners then re-init them for the current drawing.
-         * there goes 4 hours of my life
-         */
-        $scope.socket.removeAllListeners();
-
         /**
          * pulls the pixels for the existing drawing
          */
