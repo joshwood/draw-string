@@ -86,13 +86,3 @@ TextTool.prototype.onMouseMove = function(options){
 TextTool.prototype.onMouseUp = function(options){
     this.socket.emit('addObject', this.placeHolder);
 }
-
-/**
- * Empty method incase we get called incorrectly (i need a base class)
- * @param o
- */
-TextTool.prototype.onPathCreated = function(o){
-    // doNothing   
-}
-
-

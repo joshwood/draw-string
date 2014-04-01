@@ -69,14 +69,6 @@ LineTool.prototype.onMouseUp = function(options){
 }
 
 /**
- * Empty method incase we get called incorrectly (i need a base class)
- * @param o
- */
-LineTool.prototype.onPathCreated = function(o){
-    // doNothing   
-}
-
-/**
  * Render will create a new LabeledLine using the current context and the placeholder data,
  * then send it out over the wire to be added to all canvases 
  */

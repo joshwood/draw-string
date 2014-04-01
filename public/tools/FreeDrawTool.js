@@ -6,6 +6,19 @@ var FreeDrawingTool = function (context){
     this.drawingId = context.drawingId;
     this.fabricCanvas = context.fabricCanvas;
     this.socket = context.socket;
+
+    var self = this;
+
+    /*
+     * this is a path specific listener so it is in the tool, not the canvas wrapper
+     */
+    this.fabricCanvas.on("path:created", function(e){
+        console.log("path created");
+        self.possiblyDirty = true;
+        self.onPathCreated(e);
+        //self.self.resetDrawingMode();
+    });
+
 };
 
 FreeDrawingTool.prototype.init = function(){

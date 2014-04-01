@@ -51,7 +51,7 @@ var CanvasWrapper = function(id, context, socket){
         self.handler.onMouseUp(o);
         //self.resetDrawingMode()
         self.mouseDown = false;
-        self.possiblyDirty = true;
+        self.possiblyDirty = true;// this is actually covering up that we are not saving accurately when needed
     });
 
     this.canvas.on("object:modified", function(e){
@@ -87,13 +87,6 @@ var CanvasWrapper = function(id, context, socket){
 
     this.canvas.on("selection:cleared", function(e){
         console.log("selection cleared ");
-    });
-
-    this.canvas.on("path:created", function(e){
-        console.log("path created");
-        self.possiblyDirty = true;
-        self.handler.onPathCreated(e);
-        //self.self.resetDrawingMode();
     });
 
     this.socket.on('changing', function(o){

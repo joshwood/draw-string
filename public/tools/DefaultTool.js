@@ -23,7 +23,3 @@ DefaultTool.prototype.onMouseMove = function(o){
 
 DefaultTool.prototype.onMouseUp = function(o){
 }
-
-DefaultTool.prototype.onPathCreated = function(o){
-
-}

@@ -72,14 +72,6 @@ RectangleTool.prototype.onMouseUp = function(options){
 };
 
 /**
- * Empty method incase we get called incorrectly (i need a base class)
- * @param options
- */
-RectangleTool.prototype.onPathCreated = function(options){
-    // do nothing
-}
-
-/**
  * Render will create a new LabeledRect using the current context and the placeholder data,
  * then send it out over the wire to be added to all canvases
  */
