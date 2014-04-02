@@ -10,6 +10,8 @@
  */
 var LineTool = function(context){
 
+    this.drawingMode = 'line';
+
     this.drawingId = context.drawingId;
     this.fabricCanvas = context.fabricCanvas;
     this.socket = context.socket;

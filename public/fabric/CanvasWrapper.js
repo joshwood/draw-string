@@ -1,7 +1,6 @@
 var CanvasWrapper = function(id, context, socket){
 
     this.canvas = new fabric.LabeledCanvas(id, context);
-    this.canvas.isDrawingMode = false;
     this.socket = socket;
     this.mouseDown = false;
     this.possiblyDirty = false;
@@ -28,7 +27,7 @@ var CanvasWrapper = function(id, context, socket){
     /*
      * initialize with default
      */
-    this.handler = this.tools.DEFAULT;
+    this.resetDrawingMode();
 
     /*
      * we have to do this because we lose 'this' when in listeners. again, not my own solution
@@ -101,6 +100,7 @@ var CanvasWrapper = function(id, context, socket){
         }else if(obj.type === "labeled-rect"){
             obj.initialize(o);
         }else if(obj.type === "labeled-i-text"){
+            // still need to figure out how to drag/scale/rotate through socket
         }
         obj.setCoords();
         self.checkForDirty();
@@ -187,6 +187,10 @@ CanvasWrapper.prototype.changeDrawingMode = function(mode){
     this.handler.init();
 };
 
+CanvasWrapper.prototype.resetDrawingMode = function(){
+    this.changeDrawingMode('default');
+};
+
 CanvasWrapper.prototype.updateCurrentColor = function(currentColor) {
     this.currentColor = currentColor;
     if(this.canvas.getActiveObject()){
@@ -213,12 +217,15 @@ CanvasWrapper.prototype.updateCanvasSize = function(viewPort) {
     this.canvas.setHeight(viewPort.height * .65);
 };
 
-CanvasWrapper.prototype.resetDrawingMode = function(){
-    this.handler = this.tools.DEFAULT;
-}
-
 CanvasWrapper.prototype.loadFromJSON = function(data){
     this.canvas.loadFromJSON(data);
+};
+
+/**
+ * dump the canvas of all objects and listeners.
+ */
+CanvasWrapper.prototype.dispose = function(){
+    this.canvas.dispose();
 };
 
 /**

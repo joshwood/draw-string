@@ -9,6 +9,9 @@
  * @constructor
  */
 var RectangleTool = function (context){
+
+    this.drawingMode = 'rectangle';
+
     this.drawingId = context.drawingId;
     this.fabricCanvas = context.fabricCanvas;
     this.socket = context.socket;

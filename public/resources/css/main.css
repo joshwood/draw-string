@@ -38,7 +38,8 @@ input{
     display: inline;
 }
 .layer-controls{
-    text-decoration: none;
+    cursor: pointer;
+    cursor: hand;
 }
 .colorbox {
     width: 22px;

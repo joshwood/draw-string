@@ -8,13 +8,15 @@ var drawings = angular.module('drawings', []);
  */
 drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', 'Drawings', function($scope, $route, $routeParams, Drawings){
 
-    var currentColor = 'red';
+    /*
+     * current color selection - duh
+     */
+    $scope.currentColor = 'red';
 
     /*
-     * a flag to indicate an action was taken in this browser that likely requires the
-     * canvas to be written off to db - LAME-O
+     * set an initial value or angular will create an empty option in the select
      */
-    $scope.possiblyDirty = false;
+    $scope.drawingMode = 'default';
 
     /**
      * init method called each time the page loads
@@ -24,15 +26,45 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
         /**
          * pulls the pixels for the existing drawing
          */
-        Drawings.get({drawingId: $routeParams.drawingId}, $scope.initCanvas, function(response){
-            console.log("error happened "+response);
-        });
+        Drawings.get({drawingId: $routeParams.drawingId},
+            function(drawing){
+                $scope.initCanvas(drawing);
+            },
+            function(response){
+                console.log("error happened "+response);
+            }
+        );
 
     };
 
     /**
+     * updates our canvas drawing mode
+     */
+    $scope.changeDrawingMode = function(){
+        $scope.canvas.changeDrawingMode($scope.drawingMode);
+    };
+
+    /**
+     * watches for layer actions and send the canvas a message accordingly
+     * @param action
+     * @returns {boolean}
+     */
+    $scope.changeLayerPosition = function(action){
+        $scope.canvas.updateLayerPosition(action);
+        return false;
+    };
+
+    /**
+     * listens for color changes and updates things accordingly
+     * @param color
+     */
+    $scope.updateColor = function(color){
+        $scope.currentColor = color;
+        $scope.canvas.updateCurrentColor(color);
+    };
+
+    /**
      * Loads drawing, inits listeners
-     * @param drawing
      */
     $scope.initCanvas = function(drawing){
 
@@ -46,38 +78,6 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
 
         $scope.canvas = new CanvasWrapper('c', ctx, $scope.socket);
         $scope.canvas.loadFromJSON(drawing);
-
-        /**
-         * Drawing mode change listener - updates our handler based on the selection
-         */
-        $('#drawingMode').on('change', function(e){
-            $scope.canvas.changeDrawingMode(this.value);
-        });
-
-        /**
-         * watches for layer manipulations and emits a socket event, and dirties the page
-         */
-        $('.layer-controls').on('click', function(e){
-            $scope.canvas.updateLayerPosition(e.currentTarget.id);
-            return false;
-        });
-
-        /**
-         * handles click event on the color selector
-         */
-        $(".colorbox").click(function(){
-            currentColor = $(this).css('background-color');
-            $('#currentColorBox').css('background-color', currentColor);
-            $scope.canvas.updateCurrentColor(currentColor);
-        });
-
-        /**
-         * utility method to return to "non-drawing" mode and set our default tool.
-         */
-        function resetDrawingMode(){
-            $('#drawingMode').val('');
-            $scope.canvas.resetDrawingMode();
-        }
 
         // get viewPort size
         var getViewPortSize = function() {
@@ -95,17 +95,15 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
             $scope.canvas.updateCanvasSize(getViewPortSize());
         });
 
-
-        /*
-         * set our current color indicator
-         */
-        $('#currentColorBox').css('background-color', currentColor);
-
-        /*
-         * inits our default $scope.handler and drawing mode dropdown value
-          */
-        //resetDrawingMode();
-
     };
+
+    /**
+     * Remove all objects and listeners from canvas when scope is destroyed (i.e. when we leave the page).
+     * Navigating away while in text mode can cause some crazy things to happen
+     */
+    $scope.$on("$destroy",  function( event ) {
+        $scope.canvas.dispose();
+        console.log("FYI - Destroyed scope for DrawingController");
+    });
 
 }]);

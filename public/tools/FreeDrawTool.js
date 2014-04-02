@@ -3,6 +3,9 @@
  * @constructor
  */
 var FreeDrawingTool = function (context){
+
+    this.drawingMode = 'free';
+
     this.drawingId = context.drawingId;
     this.fabricCanvas = context.fabricCanvas;
     this.socket = context.socket;
@@ -29,7 +32,6 @@ FreeDrawingTool.prototype.onMouseDown = function(o, context){
 
     this.currentColor = context.currentColor;
     this.strokeWidth = context.strokeWidth || 6;
-
 };
 
 FreeDrawingTool.prototype.onMouseMove = function(o){

@@ -5,6 +5,8 @@
  */
 var DefaultTool = function(context){
 
+    this.drawingMode = 'default';
+
     this.drawingId = context.drawingId;
     this.currentColor = context.currentColor;
     this.fabricCanvas = context.fabricCanvas;

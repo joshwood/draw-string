@@ -1,11 +1,11 @@
 <div ng-controller="DrawingsController" ng-init="init()">
 
-    <h3>Drawing: {{drawing.name}}</h3>
+    <h3>Drawing: {{drawing.name}} - {{canvas.handler.drawingMode}}</h3>
 
     <div style="display: inline-block; border: solid 1px; width: 97%;">
         <div style="border: solid 1px; display: block; padding: 5px; margin: 5px; float: left;">
             <div>Drawing Mode</div>
-            <select id="drawingMode">
+            <select id="drawingMode" ng-model="drawingMode" ng-change="changeDrawingMode()">
                 <option value="default">Off</option>
                 <option value="rectangle">Rectangle</option>
                 <option value="line">Line</option>
@@ -16,28 +16,28 @@
         <div style="border: solid 1px; display: block; padding: 5px; margin: 5px; float: left;">
             <div>forward/back</div>
             <div>
-                <a href="#" id="sendToBack" class="layer-controls"><img src="resources/images/arrow-first.gif"></a>
-                <a href="#" id="sendBackwards" class="layer-controls"><img src="resources/images/arrow-previous.gif"></a>
-                <a href="#" id="bringForward" class="layer-controls"><img src="resources/images/arrow-next.gif"></a>
-                <a href="#" id="bringToFront" class="layer-controls"><img src="resources/images/arrow-last.gif" alt="Bring to Front"></a>
+                <img src="resources/images/arrow-first.gif" class="layer-controls" ng-click="changeLayerPosition('sendToBack')">
+                <img src="resources/images/arrow-previous.gif" class="layer-controls" ng-click="changeLayerPosition('sendBackwards')">
+                <img src="resources/images/arrow-next.gif" class="layer-controls" ng-click="changeLayerPosition('bringForward')">
+                <img src="resources/images/arrow-last.gif" class="layer-controls" ng-click="changeLayerPosition('bringToFront')">
             </div>
         </div>
         <div style="border: solid 1px; display: block; padding: 5px; margin: 5px; float: left;">
             <div>
                 <div style="display: block; float: left; padding-right: 10px">
-                    <div class="colorbox" id="currentColorBox"></div>
+                    <div class="colorbox" id="currentColorBox" ng-style="{backgroundColor: currentColor}"></div>
                     <div>Color</div>
                 </div>
                 <div id="colorholder" style="float: left;">
-                    <div class="colorbox" style="background-color: white"></div>
-                    <div class="colorbox" style="background-color: black"></div>
-                    <div class="colorbox" style="background-color: red"></div>
-                    <div class="colorbox" style="background-color: green"></div>
+                    <div class="colorbox" style="background-color: white" ng-click="updateColor('white')"></div>
+                    <div class="colorbox" style="background-color: black" ng-click="updateColor('black')"></div>
+                    <div class="colorbox" style="background-color: red" ng-click="updateColor('red')"></div>
+                    <div class="colorbox" style="background-color: green" ng-click="updateColor('green')"></div>
                     <br/>
-                    <div class="colorbox" style="background-color: blue"></div>
-                    <div class="colorbox" style="background-color: deepskyblue"></div>
-                    <div class="colorbox" style="background-color: yellow"></div>
-                    <div class="colorbox" style="background-color: chartreuse"></div>
+                    <div class="colorbox" style="background-color: blue" ng-click="updateColor('blue')"></div>
+                    <div class="colorbox" style="background-color: deepskyblue" ng-click="updateColor('deepskyblue')"></div>
+                    <div class="colorbox" style="background-color: yellow" ng-click="updateColor('yellow')"></div>
+                    <div class="colorbox" style="background-color: chartreuse" ng-click="updateColor('chartreuse')"></div>
                 </div>
             </div>
         </div>
