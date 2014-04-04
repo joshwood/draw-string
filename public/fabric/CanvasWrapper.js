@@ -19,6 +19,7 @@ var CanvasWrapper = function(id, context, socket){
     this.tools = {
         LINE :      new LineTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
         RECTANGLE : new RectangleTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
+        CIRCLE : new CircleTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
         FREE :      new FreeDrawingTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
         TEXT :      new TextTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
         DEFAULT :   new DefaultTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket})
@@ -97,7 +98,7 @@ var CanvasWrapper = function(id, context, socket){
             obj.initialize([o.x1, o.y1, o.x2, o.y2], o);
         }else if(obj.type === "labeled-path" || obj.type === "path"){
             obj.initialize(o.path, o);
-        }else if(obj.type === "labeled-rect"){
+        }else if(obj.type === "labeled-rect" || obj.type === "labeled-circle"){
             obj.initialize(o);
         }else if(obj.type === "labeled-i-text"){
             // for some reason i can't just initialize text like the others - @hack
