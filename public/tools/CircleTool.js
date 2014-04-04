@@ -54,7 +54,9 @@ CircleTool.prototype.onMouseDown = function(options, context){
  */
 CircleTool.prototype.onMouseMove = function(options){
     var pointer = this.fabricCanvas.getPointer(options.e);
-    this.placeHolder.radius = Math.abs(this.placeHolder.left - pointer.x);
+    var w = this.placeHolder.left-pointer.x;
+    var h = this.placeHolder.top-pointer.y;
+    this.placeHolder.radius = Math.sqrt(w*w + h*h);
     this.fabricCanvas.renderAll();
 };
 
