@@ -100,7 +100,16 @@ var CanvasWrapper = function(id, context, socket){
         }else if(obj.type === "labeled-rect"){
             obj.initialize(o);
         }else if(obj.type === "labeled-i-text"){
-            // still need to figure out how to drag/scale/rotate through socket
+            // for some reason i can't just initialize text like the others - @hack
+            obj.top = o.top;
+            obj.left = o.left;
+            obj.angle = o.angle;
+            obj.flipX = o.flipX;
+            obj.flipY = o.flipY;
+            obj.scaleX = o.scaleX;
+            obj.scaleY = o.scaleY;
+            obj.height = o.height;
+            obj.width = o.width;
         }
         obj.setCoords();
         self.checkForDirty();
