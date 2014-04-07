@@ -24,6 +24,7 @@ var CanvasWrapper = function(id, context, socket){
         CIRCLE :    new CircleTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
         FREE :      new FreeDrawingTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
         TEXT :      new TextTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
+        FILL :      new FillTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
         DEFAULT :   new DefaultTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket})
     };
 
@@ -45,7 +46,7 @@ var CanvasWrapper = function(id, context, socket){
     this.canvas.on("mouse:down", function(o){
         self.mouseDown = true;
         // if we're hovering and clicking we disable the current drawing mode
-        if(self.canvas._hoveredTarget && self.handler.drawingMode !== 'default'){
+        if(self.canvas._hoveredTarget && self.handler.drawingMode !== 'default' && self.handler.drawingMode !== 'fill'){
             self.deactivatedTool = self.handler;
             self.handler = self.tools.DEFAULT;
             self.handler.init();
@@ -135,8 +136,6 @@ var CanvasWrapper = function(id, context, socket){
     this.socket.on('changing', function(o){
         var obj = self.canvas.findById(o._id);
         if(!obj) return;
-        // we must set to active every time, seems odd but only way to make it "real time" react
-        self.canvas.setActiveObject(obj);
         // this is pretty lame, i'm just transferring everything, surely a better way
         if(obj.type === "labeled-line"){
             obj.initialize([o.x1, o.y1, o.x2, o.y2], o);
@@ -158,6 +157,7 @@ var CanvasWrapper = function(id, context, socket){
         }
         obj.setCoords();
         self.checkForDirty();
+        self.canvas.renderAll();
     });
 
     /**
@@ -235,7 +235,7 @@ var CanvasWrapper = function(id, context, socket){
         self.checkForDirty();
     });
 
-}
+};
 
 /**
  * utility method to return to "non-drawing" mode and set our default tool.
@@ -261,9 +261,6 @@ CanvasWrapper.prototype.updateCurrentColor = function(currentColor) {
     if(this.canvas.getActiveObject()){
         this.canvas.getActiveObject().stroke = currentColor;
         this.canvas.getActiveObject().setCoords();
-        // this is lame, for some reason when changing colors, clients dont' update
-        // we send 2 messages and it updates
-        this.socket.emit('changing', this.canvas.getActiveObject());
         this.socket.emit('changing', this.canvas.getActiveObject());
         this.possiblyDirty = true;
     }
@@ -303,6 +300,11 @@ CanvasWrapper.prototype.loadFromJSON = function(data){
 CanvasWrapper.prototype.dispose = function(){
     this.canvas.dispose();
 };
+
+CanvasWrapper.prototype.discardActiveObject = function(){
+    this.canvas.discardActiveObject();
+};
+
 
 /**
  * here we will write off our canvas if any dirty-ing actions have recently occurred (ugh)

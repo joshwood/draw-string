@@ -42,6 +42,7 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
      * updates our canvas drawing mode
      */
     $scope.changeDrawingMode = function(){
+        $scope.canvas.discardActiveObject();
         $scope.canvas.changeDrawingMode($scope.drawingMode);
     };
 
@@ -87,6 +88,8 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
 
         $scope.canvas = new CanvasWrapper('c', ctx);
         $scope.canvas.loadFromJSON(drawing);
+
+        $scope.canvas.discardActiveObject();
 
         // get viewPort size
         var getViewPortSize = function() {
