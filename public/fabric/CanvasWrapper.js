@@ -3,7 +3,6 @@ var CanvasWrapper = function(id, context, socket){
     this.canvas = new fabric.LabeledCanvas(id, context);
     this.socket = socket;
     this.mouseDown = false;
-    this.overObject = false;
     this.possiblyDirty = false;
     this.currentColor = 'red';
 
@@ -38,21 +37,32 @@ var CanvasWrapper = function(id, context, socket){
      */
     var self = this;
 
+    /**
+     * obviously a mouse down listener, but more importantly this is the
+     * start of an action when in a drawing mode
+     */
     this.canvas.on("mouse:down", function(o){
         self.mouseDown = true;
         // if we're hovering and clicking we disable the current drawing mode
-        if(self.overObject && self.handler.drawingMode !== 'default'){
+        if(self.canvas._hoveredTarget && self.handler.drawingMode !== 'default'){
             self.deactivatedTool = self.handler;
             self.handler = self.tools.DEFAULT;
+            self.handler.init();
         }
         self.handler.onMouseDown(o, {'currentColor': self.currentColor});
     });
 
+    /**
+     * we're basically interested in drag, so we exit if mouse is not down
+     */
     this.canvas.on("mouse:move", function(o){
         if(!self.mouseDown) return;
         self.handler.onMouseMove(o);
     });
 
+    /**
+     * mouse up will typically indicate the end of an action when we are in a drawing mode.
+     */
     this.canvas.on("mouse:up", function(o){
         console.log("MOUSE UP");
         self.handler.onMouseUp(o);
@@ -67,21 +77,22 @@ var CanvasWrapper = function(id, context, socket){
     });
 
     /**
-     * mouse:over is behaving like object over in 1.4.4 so we'll treat it that way for now
+     * mouse:over is behaving like object over in 1.4.4
      */
     this.canvas.on("mouse:over", function(e){
-        console.log('mouse over')
-        self.overObject = true;
+        //console.log('mouse over')
     });
 
     /**
-     * mouse:out is behaving like object out in 1.4.4 so we'll treat it that way for now
+     * mouse:out is behaving like object out in 1.4.4
      */
     this.canvas.on("mouse:out", function(e){
-        console.log('mouse out')
-        self.overObject = false;
+        //console.log('mouse out')
     });
 
+    /**
+     * called when scaling, rotating or moving are complete
+     */
     this.canvas.on("object:modified", function(e){
         console.log('modified : saving canvas');
         self.socket.emit('saveDrawing', self.canvas);
@@ -117,6 +128,9 @@ var CanvasWrapper = function(id, context, socket){
         console.log("selection cleared ");
     });
 
+    /**
+     * listens for changing events, these are scaling, moving, color change, etc
+     */
     this.socket.on('changing', function(o){
         var obj = self.canvas.findById(o._id);
         if(!obj) return;
@@ -230,10 +244,17 @@ CanvasWrapper.prototype.changeDrawingMode = function(mode){
     this.handler.init();
 };
 
+/**
+ * helper method to change to default drawing mode
+ */
 CanvasWrapper.prototype.resetDrawingMode = function(){
     this.changeDrawingMode('default');
 };
 
+/**
+ * Changes the active object's fill and stroke and sends it over the socket
+ * @param currentColor
+ */
 CanvasWrapper.prototype.updateCurrentColor = function(currentColor) {
     this.currentColor = currentColor;
     if(this.canvas.getActiveObject()){
@@ -248,6 +269,10 @@ CanvasWrapper.prototype.updateCurrentColor = function(currentColor) {
     }
 }
 
+/**
+ * Accepts the layer move command and emits it over the socket for clients to respond
+ * @param action
+ */
 CanvasWrapper.prototype.updateLayerPosition = function(action) {
     if(this.canvas.getActiveObject()){
         this.socket.emit(action, this.canvas.getActiveObject());
@@ -255,11 +280,19 @@ CanvasWrapper.prototype.updateLayerPosition = function(action) {
     }
 };
 
+/**
+ * used to resize the canvas based on the window
+ * @param viewPort
+ */
 CanvasWrapper.prototype.updateCanvasSize = function(viewPort) {
     this.canvas.setWidth(viewPort.width * .95);
     this.canvas.setHeight(viewPort.height * .65);
 };
 
+/**
+ * wrapper of the loadFromJSON method in the real canvas
+ * @param data
+ */
 CanvasWrapper.prototype.loadFromJSON = function(data){
     this.canvas.loadFromJSON(data);
 };
