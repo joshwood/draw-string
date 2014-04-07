@@ -15,6 +15,12 @@ var CircleTool = function (context){
     this.drawingId = context.drawingId;
     this.fabricCanvas = context.fabricCanvas;
     this.socket = context.socket;
+
+    this.fabricCanvas.on("object:added", function(o){
+        if(o.target.type !== 'labeled-circle') return;
+        this.setActiveObject(o.target);
+    });
+
 };
 
 CircleTool.prototype.init = function(){

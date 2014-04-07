@@ -15,6 +15,11 @@ var RectangleTool = function (context){
     this.drawingId = context.drawingId;
     this.fabricCanvas = context.fabricCanvas;
     this.socket = context.socket;
+
+    this.fabricCanvas.on("object:added", function(o){
+        if(o.target.type !== 'labeled-rect') return;
+        this.setActiveObject(o.target);
+    });
 };
 
 RectangleTool.prototype.init = function(){

@@ -41,7 +41,7 @@ var CanvasWrapper = function(id, context, socket){
     this.canvas.on("mouse:down", function(o){
         self.mouseDown = true;
         // if we're hovering and clicking we disable the current drawing mode
-        if(self.overObject){
+        if(self.overObject && self.handler.drawingMode !== 'default'){
             self.deactivatedTool = self.handler;
             self.handler = self.tools.DEFAULT;
         }
@@ -70,6 +70,7 @@ var CanvasWrapper = function(id, context, socket){
      * mouse:over is behaving like object over in 1.4.4 so we'll treat it that way for now
      */
     this.canvas.on("mouse:over", function(e){
+        console.log('mouse over')
         self.overObject = true;
     });
 
@@ -77,6 +78,7 @@ var CanvasWrapper = function(id, context, socket){
      * mouse:out is behaving like object out in 1.4.4 so we'll treat it that way for now
      */
     this.canvas.on("mouse:out", function(e){
+        console.log('mouse out')
         self.overObject = false;
     });
 
@@ -166,7 +168,6 @@ var CanvasWrapper = function(id, context, socket){
         var type = fabric.util.string.camelize(fabric.util.string.capitalize(o.type));
         var newO = fabric[type].fromObject(o);
         self.canvas.add(newO);
-        self.canvas.setActiveObject(newO);
         self.checkForDirty();
 
     });

@@ -15,6 +15,11 @@ var TriangleTool = function (context){
     this.drawingId = context.drawingId;
     this.fabricCanvas = context.fabricCanvas;
     this.socket = context.socket;
+
+    this.fabricCanvas.on("object:added", function(o){
+        if(o.target.type !== 'labeled-triangle') return;
+        this.setActiveObject(o.target);
+    });
 };
 
 TriangleTool.prototype.init = function(){

@@ -22,6 +22,11 @@ var FreeDrawingTool = function (context){
         //self.self.resetDrawingMode();
     });
 
+    this.fabricCanvas.on("object:added", function(o){
+        if(o.target.type !== 'labeled-path') return;
+        this.setActiveObject(o.target);
+    });
+
 };
 
 FreeDrawingTool.prototype.init = function(){

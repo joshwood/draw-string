@@ -16,6 +16,11 @@ var LineTool = function(context){
     this.fabricCanvas = context.fabricCanvas;
     this.socket = context.socket;
     this.fabricCanvas.isDrawingMode = false;
+
+    this.fabricCanvas.on("object:added", function(o){
+        if(o.target.type !== 'labeled-line') return;
+        this.setActiveObject(o.target);
+    });
 }
 
 LineTool.prototype.init = function(){
