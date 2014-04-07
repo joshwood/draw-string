@@ -3,6 +3,7 @@ var CanvasWrapper = function(id, context, socket){
     this.canvas = new fabric.LabeledCanvas(id, context);
     this.socket = socket;
     this.mouseDown = false;
+    this.overObject = false;
     this.possiblyDirty = false;
     this.currentColor = 'red';
 
@@ -19,8 +20,8 @@ var CanvasWrapper = function(id, context, socket){
     this.tools = {
         LINE :      new LineTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
         RECTANGLE : new RectangleTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
-        TRIANGLE : new TriangleTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
-        CIRCLE : new CircleTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
+        TRIANGLE :  new TriangleTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
+        CIRCLE :    new CircleTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
         FREE :      new FreeDrawingTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
         TEXT :      new TextTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket}),
         DEFAULT :   new DefaultTool({'drawingId':this.canvas._id, 'fabricCanvas':this.canvas, 'socket':this.socket})
@@ -39,6 +40,11 @@ var CanvasWrapper = function(id, context, socket){
 
     this.canvas.on("mouse:down", function(o){
         self.mouseDown = true;
+        // if we're hovering and clicking we disable the current drawing mode
+        if(self.overObject){
+            self.deactivatedTool = self.handler;
+            self.handler = self.tools.DEFAULT;
+        }
         self.handler.onMouseDown(o, {'currentColor': self.currentColor});
     });
 
@@ -50,9 +56,28 @@ var CanvasWrapper = function(id, context, socket){
     this.canvas.on("mouse:up", function(o){
         console.log("MOUSE UP");
         self.handler.onMouseUp(o);
-        //self.resetDrawingMode()
         self.mouseDown = false;
-        self.possiblyDirty = true;// this is actually covering up that we are not saving accurately when needed
+        // this is actually covering up that we are not saving accurately when needed
+        self.possiblyDirty = true;
+        // reactive drawing tool if we had disabled previously
+        if(self.deactivatedTool){
+            self.handler = self.deactivatedTool;
+            self.deactivatedTool = null;
+        }
+    });
+
+    /**
+     * mouse:over is behaving like object over in 1.4.4 so we'll treat it that way for now
+     */
+    this.canvas.on("mouse:over", function(e){
+        self.overObject = true;
+    });
+
+    /**
+     * mouse:out is behaving like object out in 1.4.4 so we'll treat it that way for now
+     */
+    this.canvas.on("mouse:out", function(e){
+        self.overObject = false;
     });
 
     this.canvas.on("object:modified", function(e){
@@ -98,7 +123,7 @@ var CanvasWrapper = function(id, context, socket){
         // this is pretty lame, i'm just transferring everything, surely a better way
         if(obj.type === "labeled-line"){
             obj.initialize([o.x1, o.y1, o.x2, o.y2], o);
-        }else if(obj.type === "labeled-path" || obj.type === "path"){
+        }else if(obj.type === "labeled-path"){
             obj.initialize(o.path, o);
         }else if(obj.type === "labeled-rect" || obj.type === "labeled-circle" || obj.type === "labeled-triangle"){
             obj.initialize(o);
@@ -141,6 +166,7 @@ var CanvasWrapper = function(id, context, socket){
         var type = fabric.util.string.camelize(fabric.util.string.capitalize(o.type));
         var newO = fabric[type].fromObject(o);
         self.canvas.add(newO);
+        self.canvas.setActiveObject(newO);
         self.checkForDirty();
 
     });
