@@ -16,6 +16,11 @@ var RectangleTool = function (context){
     this.fabricCanvas = context.fabricCanvas;
     this.socket = context.socket;
 
+    /**
+     * here we set the recently added object to active, this could be a common function
+     * except text has to be set to active, THEN entered into drawing mode so each tool
+     * listens for this event individually
+     */
     this.fabricCanvas.on("object:added", function(o){
         if(o.target.type !== 'labeled-rect') return;
         this.setActiveObject(o.target);
@@ -36,11 +41,12 @@ RectangleTool.prototype.init = function(){
 RectangleTool.prototype.onMouseDown = function(options, context){
     
     this.currentColor = context.currentColor;
+    this.stroke = context.currentColor;
     this.strokeWidth = context.strokeWidth || 1;
-    
+
     var pointer = this.fabricCanvas.getPointer(options.e);
     this.placeHolder = new fabric.Rect({
-        strokeWidth: 1,
+        strokeWidth: this.strokeWidth,
         strokeDashArray: [5, 3],
         stroke: this.currentColor,
         fill: '',
@@ -92,7 +98,9 @@ RectangleTool.prototype.render = function(){
         originY: 'top',
         width: this.placeHolder.width,
         height: this.placeHolder.height,
-        fill: this.currentColor
+        fill: '',
+        stroke: this.currentColor,
+        strokeWidth: this.strokeWidth
     });
     this.socket.emit('addObject', rect);
 };

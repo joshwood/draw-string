@@ -1,10 +1,11 @@
 var CanvasWrapper = function(id, context, socket){
 
     this.canvas = new fabric.LabeledCanvas(id, context);
-    this.socket = socket;
+    this.socket = context.socket;
     this.mouseDown = false;
     this.possiblyDirty = false;
-    this.currentColor = 'red';
+    this.currentColor = context.currentColor;
+    this.strokeWidth = context.strokeWidth || '1';
 
     /*
      * because we're a single page app the socket listeners from previous drawing views persist.
@@ -49,7 +50,7 @@ var CanvasWrapper = function(id, context, socket){
             self.handler = self.tools.DEFAULT;
             self.handler.init();
         }
-        self.handler.onMouseDown(o, {'currentColor': self.currentColor});
+        self.handler.onMouseDown(o, {'currentColor': self.currentColor, 'strokeWidth': self.strokeWidth});
     });
 
     /**
@@ -258,7 +259,6 @@ CanvasWrapper.prototype.resetDrawingMode = function(){
 CanvasWrapper.prototype.updateCurrentColor = function(currentColor) {
     this.currentColor = currentColor;
     if(this.canvas.getActiveObject()){
-        this.canvas.getActiveObject().fill = currentColor;
         this.canvas.getActiveObject().stroke = currentColor;
         this.canvas.getActiveObject().setCoords();
         // this is lame, for some reason when changing colors, clients dont' update

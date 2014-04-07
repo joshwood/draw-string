@@ -12,16 +12,20 @@ var FreeDrawingTool = function (context){
 
     var self = this;
 
-    /*
+    /**
      * this is a path specific listener so it is in the tool, not the canvas wrapper
      */
     this.fabricCanvas.on("path:created", function(e){
         console.log("path created");
         self.possiblyDirty = true;
         self.onPathCreated(e);
-        //self.self.resetDrawingMode();
     });
 
+    /**
+     * here we set the recently added object to active, this could be a common function
+     * except text has to be set to active, THEN entered into drawing mode so each tool
+     * listens for this event individually
+     */
     this.fabricCanvas.on("object:added", function(o){
         if(o.target.type !== 'labeled-path') return;
         this.setActiveObject(o.target);

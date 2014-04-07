@@ -16,6 +16,11 @@ var CircleTool = function (context){
     this.fabricCanvas = context.fabricCanvas;
     this.socket = context.socket;
 
+    /**
+     * here we set the recently added object to active, this could be a common function
+     * except text has to be set to active, THEN entered into drawing mode so each tool
+     * listens for this event individually
+     */
     this.fabricCanvas.on("object:added", function(o){
         if(o.target.type !== 'labeled-circle') return;
         this.setActiveObject(o.target);
@@ -41,7 +46,7 @@ CircleTool.prototype.onMouseDown = function(options, context){
     
     var pointer = this.fabricCanvas.getPointer(options.e);
     this.placeHolder = new fabric.Circle({
-        strokeWidth: 1,
+        strokeWidth: this.strokeWidth,
         strokeDashArray: [5, 3],
         stroke: this.currentColor,
         fill: '',
@@ -90,7 +95,9 @@ CircleTool.prototype.render = function(){
         originX: 'center',
         originY: 'center',
         radius: this.placeHolder.radius,
-        fill: this.currentColor
+        fill: '',
+        stroke: this.currentColor,
+        strokeWidth: this.strokeWidth
     });
     this.socket.emit('addObject', circle);
 };

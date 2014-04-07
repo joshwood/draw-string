@@ -17,6 +17,11 @@ var LineTool = function(context){
     this.socket = context.socket;
     this.fabricCanvas.isDrawingMode = false;
 
+    /**
+     * here we set the recently added object to active, this could be a common function
+     * except text has to be set to active, THEN entered into drawing mode so each tool
+     * listens for this event individually
+     */
     this.fabricCanvas.on("object:added", function(o){
         if(o.target.type !== 'labeled-line') return;
         this.setActiveObject(o.target);
@@ -43,7 +48,7 @@ LineTool.prototype.onMouseDown = function(options, context){
     var points = [ pointer.x, pointer.y, pointer.x, pointer.y ];
 
     this.placeHolder = new fabric.Line(points, {
-        strokeWidth: 1,
+        strokeWidth: this.strokeWidth,
         strokeDashArray: [5, 3],
         stroke: this.currentColor,
         fill: '',
@@ -83,7 +88,7 @@ LineTool.prototype.render = function(){
     var newLine = new fabric.LabeledLine([this.placeHolder.x1, this.placeHolder.y1, this.placeHolder.x2, this.placeHolder.y2], {
         drawingId: this.drawingId,
         strokeWidth: this.strokeWidth,
-        fill: this.currentColor,
+        fill: '',
         stroke: this.currentColor,
         originX: 'center',
         originY: 'center'

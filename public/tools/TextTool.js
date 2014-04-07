@@ -18,12 +18,19 @@ var TextTool = function(context){
 
     var self = this;
 
+    /**
+     * here we listen for text changed even on the canvas and emit for clients to hear
+     */
     this.fabricCanvas.on('text:changed', function(o){
         console.log(o.target.text);
         self.socket.emit('text-changing', o.target);
         self.socket.emit('saveDrawing', self.fabricCanvas);
     });
 
+    /**
+     * here we listen for the text-changing event on the socket, it is a special change so it has it's own
+     * handlers even in fabric
+     */
     this.socket.on('text-changing', function(o){
         if(o.type !== "labeled-i-text") return;
         var obj = self.fabricCanvas.findById(o._id);
@@ -37,6 +44,17 @@ var TextTool = function(context){
         self.fabricCanvas.setActiveObject(obj);
         obj.enterEditing();
     });
+
+    /**
+     * here we listen for object added events and if it is a text object, we set the object
+     * as the activeObject and enterEditing mode
+     */
+    this.fabricCanvas.on("object:added", function(o){
+        if(o.target.type !== 'labeled-i-text') return;
+        this.setActiveObject(o.target);
+        o.target.enterEditing();
+    });
+
 };
 
 TextTool.prototype.init = function(){
@@ -64,14 +82,6 @@ TextTool.prototype.onMouseDown = function(options, context){
         top: pointer.y,
         padding: 7
     });
-
-    this.fabricCanvas.on("object:added", function(o){
-        var socket = self.socket;
-        if(o.target.type !== 'labeled-i-text') return;
-        this.setActiveObject(o.target);
-        o.target.enterEditing();
-    });
-
 };
 
 /**

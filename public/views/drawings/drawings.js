@@ -11,7 +11,8 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
     /*
      * current color selection - duh
      */
-    $scope.currentColor = 'red';
+    $scope.currentColor = 'deepskyblue';
+    $scope.strokeWidth = 2;
 
     /*
      * set an initial value or angular will create an empty option in the select
@@ -74,9 +75,17 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
          * here we set our custom props, because i'm too stupid to figure out how to make loadFromJson do it.
          * works fine with my other custom objects
          */
-        var ctx = {'name': $scope.drawing.name, _id: $scope.drawing._id, description: $scope.drawing.description, selection: false};
+        var ctx = {
+            'name': $scope.drawing.name,
+            '_id': $scope.drawing._id,
+            'description': $scope.drawing.description,
+            'currentColor': $scope.currentColor,
+            'strokeWidth': $scope.strokeWidth,
+            'socket': $scope.socket,
+            'selection': false
+        };
 
-        $scope.canvas = new CanvasWrapper('c', ctx, $scope.socket);
+        $scope.canvas = new CanvasWrapper('c', ctx);
         $scope.canvas.loadFromJSON(drawing);
 
         // get viewPort size

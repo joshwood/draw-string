@@ -16,6 +16,11 @@ var TriangleTool = function (context){
     this.fabricCanvas = context.fabricCanvas;
     this.socket = context.socket;
 
+    /**
+     * here we set the recently added object to active, this could be a common function
+     * except text has to be set to active, THEN entered into drawing mode so each tool
+     * listens for this event individually
+     */
     this.fabricCanvas.on("object:added", function(o){
         if(o.target.type !== 'labeled-triangle') return;
         this.setActiveObject(o.target);
@@ -40,7 +45,7 @@ TriangleTool.prototype.onMouseDown = function(options, context){
     
     var pointer = this.fabricCanvas.getPointer(options.e);
     this.placeHolder = new fabric.Triangle({
-        strokeWidth: 1,
+        strokeWidth: this.strokeWidth,
         strokeDashArray: [5, 3],
         stroke: this.currentColor,
         fill: '',
@@ -94,7 +99,9 @@ TriangleTool.prototype.render = function(){
         originY: 'top',
         width: this.placeHolder.width,
         height: this.placeHolder.height,
-        fill: this.currentColor
+        fill: '',
+        stroke: this.currentColor,
+        strokeWidth: this.strokeWidth
     });
     this.socket.emit('addObject', rect);
 };
