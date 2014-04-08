@@ -2,19 +2,27 @@
 
     <h3>Drawing: {{drawing.name}}</h3>
 
+
     <div style="display: inline-block; border: solid 1px; width: 97%;">
         <div style="border: solid 1px; display: block; padding: 5px; margin: 5px; float: left;">
-            <div>Drawing Mode</div>
-            <select id="drawingMode" ng-model="drawingMode" ng-change="changeDrawingMode()">
-                <option value="default">Off</option>
-                <option value="rectangle">Rectangle</option>
-                <option value="circle">Circle</option>
-                <option value="triangle">Triangle</option>
-                <option value="line">Line</option>
-                <option value="free">Free Draw</option>
-                <option value="text">Text</option>
-                <option value="fill">Fill</option>
-            </select>
+            <div>Tools</div>
+            <div>
+                <!-- this is an ugly way to deal with changing drawing mode, will readdress later -->
+                <img src="resources/images/pointer.png" class="toolButton-{{ drawingMode === 'default' ? 'on' : 'off'}}" ng-click="changeDrawingMode('default')">
+                <img src="resources/images/pencil.png" class="toolButton-{{ drawingMode === 'free' ? 'on' : 'off'}}" ng-click="changeDrawingMode('free')">
+                <img src="resources/images/fill.png" class="toolButton-{{ drawingMode === 'fill' ? 'on' : 'off'}}" ng-click="changeDrawingMode('fill')">
+                <img src="resources/images/text.png" class="toolButton-{{ drawingMode === 'text' ? 'on' : 'off'}}" ng-click="changeDrawingMode('text')">
+            </div>
+        </div>
+        <div style="border: solid 1px; display: block; padding: 5px; margin: 5px; float: left;">
+            <div>Shapes</div>
+            <div>
+                <!-- this is an ugly way to deal with changing drawing mode, will readdress later -->
+                <img src="resources/images/line.png" class="toolButton-{{ drawingMode === 'line' ? 'on' : 'off'}}" ng-click="changeDrawingMode('line')">
+                <img src="resources/images/circle.png" class="toolButton-{{ drawingMode === 'circle' ? 'on' : 'off'}}" ng-click="changeDrawingMode('circle')">
+                <img src="resources/images/rectangle.png" class="toolButton-{{ drawingMode === 'rectangle' ? 'on' : 'off'}}" ng-click="changeDrawingMode('rectangle')">
+                <img src="resources/images/triangle.png" class="toolButton-{{ drawingMode === 'triangle' ? 'on' : 'off'}}" ng-click="changeDrawingMode('triangle')">
+            </div>
         </div>
         <div style="border: solid 1px; display: block; padding: 5px; margin: 5px; float: left;">
             <div>forward/back</div>

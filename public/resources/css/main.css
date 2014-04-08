@@ -55,3 +55,13 @@ input{
     display: inline-block;
     border: 3px solid black;
 }
+.toolButton-off{
+    border: solid #808080 thin;
+    cursor: pointer;
+    cursor: hand;
+}
+.toolButton-on{
+    border: solid #808080 medium;
+    cursor: pointer;
+    cursor: hand;
+}

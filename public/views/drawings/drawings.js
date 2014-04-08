@@ -17,7 +17,7 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
     /*
      * set an initial value or angular will create an empty option in the select
      */
-    $scope.drawingMode = 'default';
+    $scope.drawingMode = 'free';
 
     /**
      * init method called each time the page loads
@@ -41,7 +41,8 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
     /**
      * updates our canvas drawing mode
      */
-    $scope.changeDrawingMode = function(){
+    $scope.changeDrawingMode = function(drawingMode){
+        $scope.drawingMode = drawingMode || $scope.drawingMode;
         $scope.canvas.discardActiveObject();
         $scope.canvas.changeDrawingMode($scope.drawingMode);
     };
@@ -82,6 +83,7 @@ drawings.controller('DrawingsController', ['$scope', '$route', '$routeParams', '
             'description': $scope.drawing.description,
             'currentColor': $scope.currentColor,
             'strokeWidth': $scope.strokeWidth,
+            'drawingMode': $scope.drawingMode,
             'socket': $scope.socket,
             'selection': false
         };

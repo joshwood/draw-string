@@ -31,7 +31,7 @@ var CanvasWrapper = function(id, context, socket){
     /*
      * initialize with default
      */
-    this.resetDrawingMode();
+    this.changeDrawingMode(context.drawingMode || this.tools.DEFAULT.drawingMode);
 
     /*
      * we have to do this because we lose 'this' when in listeners. again, not my own solution
