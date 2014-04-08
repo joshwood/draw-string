@@ -28,3 +28,10 @@ app.controller('MainController', ['$scope', function($scope){
     $scope.socket = io.connect("http://"+window.location.hostname+":3000");
 
 }]);
+
+
+//Ensures there will be no 'console is undefined' errors (IE)
+window.console = window.console || (function(){
+    var c = {}; c.log = c.warn = c.debug = c.info = c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function(){};
+    return c;
+})();
