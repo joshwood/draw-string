@@ -1,0 +1,67 @@
+body {
+    margin: 10px;
+    background-color: #f8f8f8;
+    color: #424547;
+}
+
+li {
+    margin-left: -20px;
+}
+
+input{
+    display: block;
+    margin: 5px 5px 5px 0px;
+}
+.module{
+}
+.box{
+    border: solid;
+    border-width: thin;
+    margin: 5px;
+    padding: 5px;
+    display: inline-table;
+}
+.boxTitle{
+    border-bottom: 1px black solid;
+    margin-bottom: 10px;
+}
+/*
+ * canvas stuff
+ */
+#c{
+    border: 1px solid;
+}
+.canvas-container{
+    margin-bottom: 10px;
+}
+#controls input{
+    display: inline;
+}
+.layer-controls{
+    cursor: pointer;
+    cursor: hand;
+}
+.colorbox {
+    width: 22px;
+    height: 22px;
+    margin: 1px;
+    display: inline-block;
+    border: 3px solid black;
+}
+#currentColorBox {
+    width: 42px;
+    height: 42px;
+    margin: 1px;
+    display: inline-block;
+    border: 3px solid black;
+}
+.toolButton-off{
+    border: solid #808080 thin;
+    cursor: pointer;
+    cursor: hand;
+}
+.toolButton-on{
+    border: solid #808080 medium;
+    cursor: pointer;
+    cursor: hand;
+}

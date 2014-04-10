@@ -1,0 +1,29 @@
+<div ng-controller="WelcomeController" ng-init="init()">
+
+	<h3>Welcome to Draw-String</h3>
+
+    <div style="padding-bottom: 25px;">
+        Click an existing drawing or create a new one. Anyone viewing the same drawing will see your updates.<br/>
+        Try opening the app in 2 browsers to see the interplay.
+    </div>
+
+    <div class="module">
+        <div class="box" ng-hide="!drawings">
+            <div class="boxTitle">Existing Drawings</div>
+            <ul ng-repeat="d in drawings">
+                <li><a href="#/drawings/{{d._id}}">{{d.name}}</a></li>
+            </ul>
+        </div>
+        <div class="box">
+            <div class="boxTitle">Create New Drawing</div>
+            <form>
+            <input type="text" class="form-control" ng-model="newDrawing.name" placeholder="Drawing Name">
+            <input type="text" class="form-control" ng-model="newDrawing.description" placeholder="Drawing Description">
+            <input type="button" class="btn-primary" ng-click="create()" value="save" style="float:right"/>
+            <input type="button" class="btn-success" ng-click="newDrawing = null" value="clear" style="float:right"/>
+            </form>
+        </div>
+    </div>
+
+
+</div>

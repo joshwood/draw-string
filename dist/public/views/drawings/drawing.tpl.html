@@ -1,0 +1,58 @@
+<div ng-controller="DrawingsController" ng-init="init()">
+
+    <h3>Drawing: {{drawing.name}}</h3>
+
+
+    <div style="display: inline-block; border: solid 1px; width: 97%;">
+        <div style="border: solid 1px; display: block; padding: 5px; margin: 5px; float: left;">
+            <div>Tools</div>
+            <div>
+                <!-- this is an ugly way to deal with changing drawing mode, will readdress later -->
+                <img src="images/pointer.png" class="toolButton-{{ drawingMode === 'default' ? 'on' : 'off'}}" ng-click="changeDrawingMode('default')">
+                <img src="images/pencil.png" class="toolButton-{{ drawingMode === 'free' ? 'on' : 'off'}}" ng-click="changeDrawingMode('free')">
+                <img src="images/fill.png" class="toolButton-{{ drawingMode === 'fill' ? 'on' : 'off'}}" ng-click="changeDrawingMode('fill')">
+                <img src="images/text.png" class="toolButton-{{ drawingMode === 'text' ? 'on' : 'off'}}" ng-click="changeDrawingMode('text')">
+            </div>
+        </div>
+        <div style="border: solid 1px; display: block; padding: 5px; margin: 5px; float: left;">
+            <div>Shapes</div>
+            <div>
+                <!-- this is an ugly way to deal with changing drawing mode, will readdress later -->
+                <img src="images/line.png" class="toolButton-{{ drawingMode === 'line' ? 'on' : 'off'}}" ng-click="changeDrawingMode('line')">
+                <img src="images/circle.png" class="toolButton-{{ drawingMode === 'circle' ? 'on' : 'off'}}" ng-click="changeDrawingMode('circle')">
+                <img src="images/rectangle.png" class="toolButton-{{ drawingMode === 'rectangle' ? 'on' : 'off'}}" ng-click="changeDrawingMode('rectangle')">
+                <img src="images/triangle.png" class="toolButton-{{ drawingMode === 'triangle' ? 'on' : 'off'}}" ng-click="changeDrawingMode('triangle')">
+            </div>
+        </div>
+        <div style="border: solid 1px; display: block; padding: 5px; margin: 5px; float: left;">
+            <div>forward/back</div>
+            <div>
+                <img src="images/arrow-first.gif" class="layer-controls" ng-click="changeLayerPosition('sendToBack')">
+                <img src="images/arrow-previous.gif" class="layer-controls" ng-click="changeLayerPosition('sendBackwards')">
+                <img src="images/arrow-next.gif" class="layer-controls" ng-click="changeLayerPosition('bringForward')">
+                <img src="images/arrow-last.gif" class="layer-controls" ng-click="changeLayerPosition('bringToFront')">
+            </div>
+        </div>
+        <div style="border: solid 1px; display: block; padding: 5px; margin: 5px; float: left;">
+            <div>
+                <div style="display: block; float: left; padding-right: 10px">
+                    <div class="colorbox" id="currentColorBox" ng-style="{backgroundColor: currentColor}"></div>
+                    <div>Color</div>
+                </div>
+                <div id="colorholder" style="float: left;">
+                    <div class="colorbox" style="background-color: white" ng-click="updateColor('white')"></div>
+                    <div class="colorbox" style="background-color: black" ng-click="updateColor('black')"></div>
+                    <div class="colorbox" style="background-color: red" ng-click="updateColor('red')"></div>
+                    <div class="colorbox" style="background-color: green" ng-click="updateColor('green')"></div>
+                    <br/>
+                    <div class="colorbox" style="background-color: blue" ng-click="updateColor('blue')"></div>
+                    <div class="colorbox" style="background-color: deepskyblue" ng-click="updateColor('deepskyblue')"></div>
+                    <div class="colorbox" style="background-color: yellow" ng-click="updateColor('yellow')"></div>
+                    <div class="colorbox" style="background-color: chartreuse" ng-click="updateColor('chartreuse')"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <canvas id="c"></canvas>
+
+</div>
