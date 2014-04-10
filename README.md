@@ -1,16 +1,14 @@
 ##Overview
-I'm modifying a simple [firebase drawing app](http://runnable.com/UnA1wDlk6cVmAAAr/firebase-collaborative-drawing-example-for-javascript)
-I found on [runnable](http://runnable.com/) to use the [MEAN](http://www.mean.io/) stack and [socket.io](http://socket.io/) while adding a few bells and whistles.
-Basically trying to simulate a web-meeting whiteboard.
-Eventually you will be able to create/save named drawings, view existing drawings, leave comments on a drawing,
-and hopefully login using various mechanisms.
+Basically trying to simulate a web-meeting whiteboard while simultaneously ripping off the look at feel of a certain drawing tool found on many PCs.
+
+The app is using [fabric.js](http://fabricjs.com/), [socket.io](http://socket.io/) on top of the [MEAN](http://www.mean.io/) stack
 
 Open 2 browser windows to the same drawing URL to see socket.io in action. As you draw on one
 screen it is reflect on the other. The "existing drawings" section will also auto update in all
 connected browsers when a new drawing is created.
 
 ##Update
-Moved original code into branch called basic-version-1.0. The master branch is now using [fabric.js](http://fabricjs.com/) a bad@ss library I can't believe exists.
+Moved original code into branch called basic-version-1.0.
 
 ##Setup
 You will need ```node``` and ```grunt``` installed and a ```mongodb``` server up on local host (default port). Once you have your environment setup, get the project dependencies by executing.
@@ -32,8 +30,14 @@ The ```server-mon``` task does the same thing as ```server``` except it restarts
     npm install -g nodemon
 
 ##Running 'For Real' - Production
-As expected, to run the application in ```node``` simply execute the command below. This will start a server at ```localhost:3030``` and open a web socket at ```localhost:3000```
+Create a distribution by executing the following. This creates a minified version of the app in the dist directory.
 
+    grunt build
+
+
+As expected, to run the application in ```node``` simply execute the commands below. This will start a server at ```yourhost:3030``` and open a web socket at ```yourhost:3000```
+
+    cd dist
     node server
 
 ##Notes

@@ -2,12 +2,22 @@ var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
 
 module.exports = function(grunt) {
 
+    // Load grunt tasks automatically
+    require('load-grunt-tasks')(grunt);
+
     grunt.initConfig({
+        myApp:{
+            web: 'public',
+            server: 'app',
+            dist: 'dist',
+            dist_web: 'dist/public',
+            dist_server: 'dist/app'
+        },
         connect: {
             options: {
                 port: 9000,
                 hostname: 'localhost',
-                base: 'public',
+                base: ['public', 'vendor'],
                 livereload: true
             },
             /*
@@ -89,26 +99,93 @@ module.exports = function(grunt) {
                     stderr: true
                 }
             }
-        }
+        },
+        useminPrepare: {
+            html: '<%= myApp.web%>/index.html',
+            options: {
+                dest: '<%= myApp.dist_web %>'
+            }
+        },
 
+        // Performs rewrites based on rev and the useminPrepare configuration
+        usemin: {
+            //html: ['<%= myApp.dist_web %>/{,*/}*.html'],
+            html: '<%= myApp.dist_web%>/index.html',
+            options: {
+                assetsDirs: ['<%= myApp.dist_web %>']
+            }
+        },
+        // Empties folders to start fresh
+        clean: {
+            dist: {
+                files: [{
+                    dot: true,
+                    src: [
+                        '.tmp',
+                        '<%= myApp.dist %>/*',
+                        '!<%= myApp.dist %>/.git*'
+                    ]
+                }]
+            }
+        },
+        copy: {
+            dist: {
+                files:[{
+                    expand: true,
+                    dot: true,
+                    cwd: '<%= myApp.web %>',
+                    dest: '<%= myApp.dist_web %>',
+                    src:[
+                        '*.html',
+                        'images/**',
+                        'styles/**',
+                        'views/**/*.html'
+                    ]
+                },
+                {
+                    expand: true,
+                    dot: true,
+                    cwd: '<%= myApp.server %>',
+                    dest: '<%= myApp.dist_server %>',
+                    src:[
+                        '**/*'
+                    ]
+                },
+                {
+                    expand: true,
+                    dot: true,
+                    cwd: '.',
+                    dest: '<%= myApp.dist %>',
+                    src:[
+                        'server.js'
+                    ]
+                }
+                ]
+            }
+        }
     });
 
-    grunt.loadNpmTasks("grunt-contrib-connect");
-    grunt.loadNpmTasks("grunt-contrib-watch");
-    grunt.loadNpmTasks("grunt-connect-proxy");
-    grunt.loadNpmTasks("grunt-open");
-    grunt.loadNpmTasks("grunt-shell-spawn");
-
+    /**
+     * starts a dev server at port 9000, with live-reload,
+     * starts our node server at port 3030 (which also opens a websocket at port 3000),
+     * establishes a proxy from our dev:9000 server to node:3030 so we can access all of our
+     * data URLS and use sockets when in our development server using live-reload like a champ.
+     */
     grunt.registerTask('server', function (target) {
         grunt.task.run([
             'shell:node',
             'configureProxies',
             'connect:livereload',
-            //'open',
+            //'open',  // you can uncomment this and the task will open your default browser to the URL - it's a little annoying sometimes
             'watch'
         ]);
     });
 
+    /**
+     * does everything 'server' does except it uses 'nodemon' to watch the node config files for changes
+     * and reloading/restarting the node server if it sees changes. nodemon is a separate dependency you will need to install
+     * it is not listed in package.json (npm install -g nodemon)
+     */
     grunt.registerTask('server-mon', function (target) {
         grunt.task.run([
             'shell:nodemon',
@@ -116,6 +193,22 @@ module.exports = function(grunt) {
             'connect:livereload',
             //'open',
             'watch'
+        ]);
+    });
+
+    /**
+     * this task builds the distribution of the application.
+     * Minifies/concats etc the JS files. this is not needed for dev purposes - see 'server' or 'server-mon'
+     */
+    grunt.registerTask('build', function (target) {
+        grunt.task.run([
+            'clean:dist',
+            'useminPrepare',
+            'concat',
+            'copy:dist',
+            //'cssmin',
+            'uglify',
+            'usemin'
         ]);
     });
 
