@@ -1,5 +1,56 @@
 <div ng-controller="AboutController">
 
-    <h3>About</h3>
+    <h1>About Draw-String</h1>
+
+    <p style="width: 60%">
+        Draw-String is meant to mimic a meeting place white board. All users viewing the same drawing will see live updates as anyone manipulates the drawing.
+        All drawings are saved for future use and/or manipulation. The app requires browsers > IE8 that support 'canvas'. It was built primarily to explore some of the newer technologies and tools.
+    </p>
+    <p style="width: 60%">
+        <h3>App details</h3>
+        <ul>
+            <li>
+                The app sits on a MEAN stack (Mongo/Express/Angular/Node)
+            </li>
+            <li>
+                It uses Fabric.js for shapes
+            </li>
+            <li>
+                Socket.io for websocket management.
+            </li>
+            <li>
+                The shapes/canvas are serialized to json and saved in the mongodb (via mongoose).
+            </li>
+            <li>
+                The fabric.js shapes have been extended to allow for adding a unique id to each (created using mongodb._id).
+            </li>
+        </ul>
+    </p>
+    <p style="width: 60%">
+        <h3>Development</h3>
+        <ul>
+            <li>
+                The development was done using WebStorm IDE.
+            </li>
+            <li>
+                Obviously, NPM for node dependencies
+            </li>
+            <li>
+                It uses GruntJs for a task runner.
+            </li>
+            <li>
+                Bower for web dependencies
+            </li>
+            <li>
+                Grunt live-reload monitors the file system for code changes and automatically reloads the file into the browser via websockets.
+            </li>
+            <li>
+                Nodemon monitors the file system for nodejs server changes and reloads them to the running instance of node.
+            </li>
+            <li>
+                Various other Grunt tasks build a distribution of the applications where javascript is combined/minified/uglified and rewrites references in index.html appropriately.
+            </li>
+        </ul>
+    </p>
 
 </div>

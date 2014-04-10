@@ -157,7 +157,8 @@ module.exports = function(grunt) {
                     cwd: '.',
                     dest: '<%= myApp.dist %>',
                     src:[
-                        'server.js'
+                        'server.js',
+                        'package.json'
                     ]
                 }
                 ]

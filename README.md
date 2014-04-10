@@ -11,9 +11,10 @@ connected browsers when a new drawing is created.
 Moved original code into branch called basic-version-1.0.
 
 ##Setup
-You will need ```node``` and ```grunt``` installed and a ```mongodb``` server up on local host (default port). Once you have your environment setup, get the project dependencies by executing.
+You will need ```node```, ```grunt``` and ```bower``` installed and a ```mongodb``` server up on local host (default port). Once you have your environment setup, get the project dependencies by executing.
 
     npm install 
+    bower install
 
 ##Running in Development Mode
 This will start a server running at ```localhost:9000```. The server will watch the 'public' directory for changes and push them to the browser automatically using the wonderful ```livereload```.
@@ -36,8 +37,10 @@ Create a distribution by executing the following. This creates a minified versio
 
 
 As expected, to run the application in ```node``` simply execute the commands below. This will start a server at ```yourhost:3030``` and open a web socket at ```yourhost:3000```
+Obviously you would move this dist directory somewhere useful prior to executing.
 
     cd dist
+    npm install --production
     node server
 
 ##Notes
