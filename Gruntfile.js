@@ -163,6 +163,10 @@ module.exports = function(grunt) {
                 }
                 ]
             }
+        },
+        bower:{
+            install:{
+            }
         }
     });
 
@@ -174,6 +178,7 @@ module.exports = function(grunt) {
      */
     grunt.registerTask('server', function (target) {
         grunt.task.run([
+            'bower',
             'shell:node',
             'configureProxies',
             'connect:livereload',
@@ -189,6 +194,7 @@ module.exports = function(grunt) {
      */
     grunt.registerTask('server-mon', function (target) {
         grunt.task.run([
+            'bower',
             'shell:nodemon',
             'configureProxies',
             'connect:livereload',
@@ -204,6 +210,7 @@ module.exports = function(grunt) {
     grunt.registerTask('build', function (target) {
         grunt.task.run([
             'clean:dist',
+            'bower',
             'useminPrepare',
             'concat',
             'copy:dist',

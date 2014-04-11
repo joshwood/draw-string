@@ -11,10 +11,16 @@ connected browsers when a new drawing is created.
 Moved original code into branch called basic-version-1.0.
 
 ##Setup
-You will need ```node```, ```grunt``` and ```bower``` installed and a ```mongodb``` server up on local host (default port). Once you have your environment setup, get the project dependencies by executing.
+You will need ```node```, ```nodemon```, ```grunt``` and ```bower``` installed and a ```mongodb``` server up on local host (default port). ```nodemon``` is a nice to have but not required.
 
-    npm install 
-    bower install
+Go to [mongo.org](http://www.mongodb.org/) and get the latest mongodb. Install and start.
+
+Go to [nodejs.org](http://nodejs.org/) and install node.
+
+Once you have done this you can use ```node``` to get the rest of the dependencies.
+
+    npm install -g grunt-cli bower nodemon
+    npm install
 
 ##Running in Development Mode
 This will start a server running at ```localhost:9000```. The server will watch the 'public' directory for changes and push them to the browser automatically using the wonderful ```livereload```.
@@ -26,15 +32,12 @@ OR...
 
     grunt server-mon
 
-The ```server-mon``` task does the same thing as ```server``` except it restarts the server automatically when a change occurs to its config files. Get ```nodemon``` by executing:
+The ```server-mon``` task does the same thing as ```server``` except it restarts the server automatically when a change occurs to its config files. This uses ```nodemon``` dependency.
 
-    npm install -g nodemon
-
-##Running 'For Real' - Production
-Create a distribution by executing the following. This creates a minified version of the app in the dist directory.
+##Build a distribution for Production
+The following command will create a minified version of the app in the dist directory.
 
     grunt build
-
 
 As expected, to run the application in ```node``` simply execute the commands below. This will start a server at ```yourhost:3030``` and open a web socket at ```yourhost:3000```
 Obviously you would move this dist directory somewhere useful prior to executing.
