@@ -1,4 +1,3 @@
-var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
 
 module.exports = function(grunt) {
 
@@ -24,16 +23,14 @@ module.exports = function(grunt) {
              * we are proxying to our node server (that we start later in the file)
              * so we can get data and have our websockets
              */
-            proxies: [
-            {
+            proxies: [{
                 context: '/drawings',
                 host: 'localhost',
                 port: 3030,
                 https: false,
                 changeOrigin: false,
                 xforward: false
-            }
-            ],
+            }],
             livereload: {
                 options: {
                     middleware: function (connect, options) {
