@@ -1,7 +1,6 @@
 'use strict';
 
 var mongoose = require('mongoose');
-var Coordinate = mongoose.model('Coordinate');
 var Drawing = mongoose.model('Drawing');
 var DrawingObject = mongoose.model('DrawingObject');
 
@@ -46,7 +45,7 @@ exports.create = function(req, res){
             res.send(500);
         } else {
             res.jsonp(drawing);
-            sockets.emit("drawings", drawing);
+            sockets.emit("add-drawing", drawing);
         }
     });
 
@@ -70,6 +69,22 @@ exports.findById = function(req, res){
 
 };
 
+/**
+ * deletes a specific drawing
+ * @param req
+ * @param res
+ */
+exports.deleteById = function(req, res){
+
+    Drawing.remove({_id: req.params.drawingId}, function(err, result){
+        if(err) return console.error(err);
+        console.log('got result '+ result);
+        sockets.emit("remove-drawing", req.params.drawingId);
+        res.jsonp(result);
+    });
+
+};
+
 
 /**
  * This is our socket listener
@@ -77,27 +92,6 @@ exports.findById = function(req, res){
  * @param socket_io
  */
 function listener(socket_io){
-
-    /*
-     * this is the listener for published coordinates. we save them
-     * under the correct drawing id and republish (under the same drawing id)
-     * for client listeners
-     */
-    socket_io.on('coordinates', function (message) {
-
-        // grab the ID of the message
-        // todo this is sent by the client so we need to verify its there
-        var drawingId = message.id;
-
-        var c = new Coordinate(message.data);
-
-        c.save(function(err, coordinate){
-            if(err) return console.error(err);
-        });
-
-        sockets.emit("drawings/"+drawingId+"/coordinates", message.data );
-
-    });
 
     //------------- object manipulation
     socket_io.on('changing', function(message){
