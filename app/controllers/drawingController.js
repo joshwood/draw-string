@@ -112,6 +112,9 @@ function listener(socket_io){
     socket_io.on('bringToFront', function(message){
         sockets.emit('bringToFront', message);
     });
+    socket_io.on('removeObject', function(message){
+        sockets.emit('removeObject', message);
+    });
     // ----------------------
 
     socket_io.on('saveDrawing', function (message) {

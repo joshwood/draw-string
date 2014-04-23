@@ -1,4 +1,4 @@
-var CanvasWrapper = function(id, context, socket){
+var CanvasWrapper = function(id, context){
 
     this.canvas = new fabric.LabeledCanvas(id, context);
     this.socket = context.socket;
@@ -234,6 +234,55 @@ var CanvasWrapper = function(id, context, socket){
         obj.bringToFront();
         self.checkForDirty();
     });
+
+    /**
+     * handles removing object from the drawing
+     */
+    this.socket.on('removeObject', function(o){
+        var obj = self.canvas.findById(o._id);
+        if(!obj) return;
+        // remove the object we got
+        self.canvas.remove(obj);
+        self.checkForDirty();
+    });
+
+    /**
+     * listen for key events and act accordingly.
+     * currently only looking at the event if there is an active object.
+     * we also don't deal with groups yet so we ignore those.
+     * @param event
+     */
+    document.onkeydown = function(event){
+        if(!self.canvas.getActiveObject()) return;
+        var key = window.event ? window.event.keyCode : event.keyCode;
+        switch(key){
+            case 37 : // left
+                self.possiblyDirty = true;
+                --self.canvas.getActiveObject().left;
+                self.socket.emit('changing', self.canvas.getActiveObject());
+                return;
+            case 38 : // up
+                self.possiblyDirty = true;
+                --self.canvas.getActiveObject().top;
+                self.socket.emit('changing', self.canvas.getActiveObject());
+                return;
+            case 39 : // right
+                self.possiblyDirty = true;
+                ++self.canvas.getActiveObject().left;
+                self.socket.emit('changing', self.canvas.getActiveObject());
+                return;
+            case 40 : // down
+                self.possiblyDirty = true;
+                ++self.canvas.getActiveObject().top;
+                self.socket.emit('changing', self.canvas.getActiveObject());
+                return;
+            case 46 : // delete
+                self.possiblyDirty = true;
+                self.socket.emit('removeObject', self.canvas.getActiveObject());
+                return;
+        }
+        console.log("got something else "+key);
+    };
 
 };
 
