@@ -17,6 +17,20 @@ Go to [mongo.org](http://www.mongodb.org/) and get the latest mongodb. Install a
 
 Go to [nodejs.org](http://nodejs.org/) and install node.
 
+Note on proxy servers: If you are behind a firewall you will need the following config files in your home directory. Obviously replace host:port with your proxy info.
+
+.npmrc
+
+    proxy=http://host:port
+    https-proxy=http://host:port
+
+.bowerrc
+
+    {
+        "proxy":"http://host:port",
+        "https-proxy":"http://host:port"
+    }
+
 Once you have done this you can use ```node``` to get the rest of the dependencies.
 
     npm install -g grunt-cli bower nodemon
