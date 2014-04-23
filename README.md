@@ -31,7 +31,7 @@ Note on proxy servers: If you are behind a firewall you will need the following 
         "https-proxy":"http://host:port"
     }
 
-Once you have done this you can use ```node``` to get the rest of the dependencies.
+Once you have done this you can use ```npm``` (node's package manager) to get the rest of the dependencies.
 
     npm install -g grunt-cli bower nodemon
     npm install
