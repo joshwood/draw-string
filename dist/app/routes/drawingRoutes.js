@@ -11,4 +11,6 @@ module.exports = function(app) {
 
     app.get('/drawings/:drawingId', drawingController.findById);
 
+    app.delete('/drawings/:drawingId', drawingController.deleteById);
+
 };

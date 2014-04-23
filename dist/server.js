@@ -28,7 +28,6 @@ mongoose.connect("mongodb://localhost/draw-string");
 /*
  * mongoose models
  */
-require('./app/models/coordinateModel');
 require('./app/models/drawingModel');
 
 /*
