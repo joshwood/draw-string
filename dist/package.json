@@ -1,6 +1,17 @@
 {
   "name": "draw-string",
   "version": "0.1.0",
+  "description": "Fabric JS drawing tool backed with MongoDB.",
+  "main" : "server.js",
+  "scripts":{
+    "test": "echo \"Error: no test specified \" && exit 1"
+  },
+  "repository":{
+    "type": "git",
+    "url": "https://github.com/joshwood/draw-string.git"
+  },
+  "author": "joshwood",
+  "license": "MIT",
   "dependencies": {
     "socket.io": "~0.9",
     "express": "~3.5",
@@ -19,7 +30,7 @@
     "grunt-contrib-uglify": "~0.2.0",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-usemin": "~2.0.0",
-    "grunt-bower-task": "~0.3",
+    "grunt-bower-task": "^0.4.0",
     "load-grunt-tasks": "~0.2.0"
   }
 

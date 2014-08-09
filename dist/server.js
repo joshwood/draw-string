@@ -46,8 +46,9 @@ require('./app/routes/drawingRoutes')(app);
 app.use(express.static(__dirname + '/public'));
 
 /*
- * express listen:3030
+ * express listen:3030 or environment var PORT
  */
-app.listen(3030);
+var port = Number(process.env.PORT || 3030);
+app.listen(port);
 
 exports = module.exports = app;
