@@ -155,6 +155,7 @@ module.exports = function(grunt) {
                     dest: '<%= myApp.dist %>',
                     src:[
                         'server.js',
+                        'Procfile',
                         'node_modules',
                         'package.json'
                     ]
