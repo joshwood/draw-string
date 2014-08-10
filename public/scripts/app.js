@@ -28,7 +28,7 @@ app.config(['$routeProvider',
  */
 app.controller('MainController', ['$scope', '$rootScope', '$log', '$location', function($scope, $rootScope, $log, $location){
 
-    $scope.socket = io.connect("http://"+window.location.hostname+":3000");
+    $scope.socket = io.connect();
 
     /*
      * every time we change we'll check in case someone clicks the navs

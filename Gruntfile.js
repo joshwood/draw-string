@@ -156,7 +156,6 @@ module.exports = function(grunt) {
                     src:[
                         'server.js',
                         'Procfile',
-                        'node_modules',
                         'package.json'
                     ]
                 }

@@ -1,11 +1,14 @@
 var mongoose = require('mongoose');
 var express = require('express');
 var app = express();
+var server = require('http').createServer(app)
 
 /*
  * web socket config
+ * changes to make sockets work in heroku were found here
+ * http://stackoverflow.com/questions/25013735/socket-io-nodejs-doesnt-work-on-heroku
  */
-var io = require('socket.io').listen(3000, {log:false});
+var io = require('socket.io').listen(server, {log:false});
 
 /*
  * required for json post.
@@ -23,7 +26,8 @@ mongoose.connection.on('error', function (err) {
   console.log(err);
   process.exit(1);
 });
-mongoose.connect("mongodb://localhost/draw-string");
+var mongoURL = process.env.MONGOHQ_URL || "mongodb://localhost";
+mongoose.connect(mongoURL + "/draw-string");
 
 /*
  * mongoose models
@@ -49,6 +53,6 @@ app.use(express.static(__dirname + '/public'));
  * express listen:3030 or environment var PORT
  */
 var port = Number(process.env.PORT || 3030);
-app.listen(port);
+server.listen(port);
 
 exports = module.exports = app;
