@@ -24,7 +24,7 @@ module.exports = function(grunt) {
              * so we can get data and have our websockets
              */
             proxies: [{
-                context: '/drawings',
+                context: ['/drawings', '/socket.io'],
                 host: 'localhost',
                 port: 3030,
                 https: false,
