@@ -64,4 +64,5 @@ Obviously you would move this dist directory somewhere useful prior to executing
 * Since the ```grunt``` tasks also start the ```node``` server, you cannot start the ```node``` server independently while you are running in development node. This will cause port conflicts.
 
 ##Note to self
+* heroku addons:add mongohq
 * git subtree push --prefix dist heroku master
