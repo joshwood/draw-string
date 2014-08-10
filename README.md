@@ -8,7 +8,7 @@ screen it is reflect on the other. The "existing drawings" section will also aut
 connected browsers when a new drawing is created.
 
 ##Application URL
-The app is currently hosted [here](http://draw-string.herokuapp.com/).
+The app is currently hosted on Heroku [here](http://draw-string.herokuapp.com/).
 
 ##Update
 Moved original code into branch called basic-version-1.0.
