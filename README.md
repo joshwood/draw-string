@@ -1,11 +1,14 @@
 ##Overview
-Basically trying to simulate a web-meeting whiteboard while simultaneously ripping off the look at feel of a certain drawing tool found on many PCs. The app is currently hosted [here](http://draw-string.herokuapp.com/).
+Basically trying to simulate a web-meeting whiteboard while simultaneously ripping off the look at feel of a certain drawing tool found on many PCs. 
 
 The app is using [fabric.js](http://fabricjs.com/), [socket.io](http://socket.io/) on top of the [MEAN](http://www.mean.io/) stack.
 
 Open 2 browser windows to the same drawing URL to see socket.io in action. As you draw on one
 screen it is reflect on the other. The "existing drawings" section will also auto update in all
 connected browsers when a new drawing is created.
+
+##Application URL
+The app is currently hosted [here](http://draw-string.herokuapp.com/).
 
 ##Update
 Moved original code into branch called basic-version-1.0.
