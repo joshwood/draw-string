@@ -164,6 +164,9 @@ module.exports = function(grunt) {
         },
         bower:{
             install:{
+                options: {
+                    cleanTargetDir: true
+                }
             }
         }
     });
